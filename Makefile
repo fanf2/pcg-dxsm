@@ -1,9 +1,11 @@
 CFLAGS= -O2 -Weverything -Wno-poison-system-directories
 
-all: pcg64.o pcg32.o
+all: test
 
 clean:
-	rm -f pcg64.o pcg32.o
+	rm -f pcg64.o pcg32.o test
+
+test: test.c pcg32.o pcg64.o
 
 pcg32.o: pcg32.c pcg32.h pcg.c pcg.h pcg-undef.h
 
