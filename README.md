@@ -39,8 +39,9 @@ RNG.
 pcg32
 -----
 
-The preferred 32-bit variant of PCG uses the `xsh_rr` output
-permutation, which is short for "xor shift rotate right".
+The file `pcg32_xsh_rr.h` contains the preferred 32-bit variant of
+PCG. The output permutation's name "XSH RR" is short for "xor shift
+rotate right".
 
 In [C++ PCG][pcg-cpp] this variant is called
 `pcg_engines::setseq_xsh_rr_64_32` or simply `pcg32` for short.
@@ -52,10 +53,10 @@ It is the only variant provided by the [basic C PCG][pcg-basic].
 pcg64
 -----
 
-The preferred 64-bit variant of PCG is `pcg64-dxsm`. It is
-harder to find out about it on [the PCG web site][pcg],
-though it is increasingly popular.
-[Melissa O'Neill describes it as follows][pcg-dxsm]:
+The file `pcg64_dxsm.h` contains the preferred 64-bit variant of PCG.
+It is harder to find out about it on [the PCG web site][pcg], though
+it is increasingly popular. [Melissa O'Neill describes it as
+follows][pcg-dxsm]:
 
 [pcg-dxsm]: https://github.com/imneme/pcg-cpp/commit/871d0494ee9c9a7b7c43f753e3d8ca47c26f8005
 
@@ -100,6 +101,28 @@ split into a fast path (which is inlined) and a slow path (a function
 call, a division, and the rejection sampling loop).
 
 [divisionless]: https://dotat.at/@/2020-10-29-nearly-divisionless-random-numbers.html
+
+
+building
+--------
+
+Type `make`.
+
+The `Makefile` generates two pairs of source files. Each pair is
+stand-alone so it's easy to copy them for use elsewhere.
+
+  * `pcg32.c` `pcg32.h`
+  * `pcg64.c` `pcg64.h`
+
+The source files in the git repository are more DRY than the generated
+files: `pcg.[ch]` contain code that is generic over the bit size:
+
+  * the RNG state type
+  * seeding the RNG
+  * Lemire's algorithm
+
+The files `pcg{32,64}_define.h` use macros to configure the generic
+code for 32 bits and 64 bits, respectively.
 
 
 license
