@@ -1,5 +1,19 @@
 /*
- * No #pragma once because you can use pcg32 and pcg64 at the same time
+ * Written by Tony Finch <dot@dotat.at> in Cambridge.
+ *
+ * Permission is hereby granted to use, copy, modify, and/or
+ * distribute this software for any purpose with or without fee.
+ *
+ * This software is provided 'as is', without warranty of any kind.
+ * In no event shall the authors be liable for any damages arising
+ * from the use of this software.
+ *
+ * SPDX-License-Identifier: 0BSD OR MIT-0
+ */
+
+/*
+ * No #pragma once because this header depends on the macros defined
+ * in "pcg32.h" and "pcg64.h" and you can use both in the same file.
  */
 
 #include <stdint.h>
