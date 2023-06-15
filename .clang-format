@@ -1,0 +1,15 @@
+BasedOnStyle: LLVM
+UseTab: Always
+IndentWidth: 8
+ContinuationIndentWidth: 8
+ColumnLimit: 80
+MaxEmptyLinesToKeep: 1
+BreakBeforeBraces: Attach
+PointerAlignment: Right
+PointerBindsToType: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakAfterDefinitionReturnType: All
+PenaltyReturnTypeOnItsOwnLine: 200
+AlignAfterOpenBracket: AlwaysBreak
+AlignConsecutiveMacros: true
+SeparateDefinitionBlocks: Always
