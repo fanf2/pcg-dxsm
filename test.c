@@ -4,7 +4,9 @@
 #include <stdio.h>
 
 #include "pcg32.h"
+#include "pcg_undef.h"
 #include "pcg64.h"
+#include "pcg_undef.h"
 
 int
 main(void) {

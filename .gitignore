@@ -1,4 +1,2 @@
 *.o
-pcg32.[ch]
-pcg64.[ch]
 test

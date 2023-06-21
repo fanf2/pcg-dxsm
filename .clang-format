@@ -13,3 +13,5 @@ PenaltyReturnTypeOnItsOwnLine: 200
 AlignAfterOpenBracket: AlwaysBreak
 AlignConsecutiveMacros: true
 SeparateDefinitionBlocks: Always
+# KeepEmptyLinesAtEOF: true
+SortIncludes: Never

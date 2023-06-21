@@ -108,14 +108,8 @@ building
 
 Type `make`.
 
-The `Makefile` generates two pairs of source files. Each pair is
-stand-alone so it's easy to copy them for use elsewhere.
-
-  * `pcg32.c` `pcg32.h`
-  * `pcg64.c` `pcg64.h`
-
-The source files in the git repository are more DRY than the generated
-files: `pcg.[ch]` contain code that is generic over the bit size:
+The source files in the git repository are fairly DRY: `pcg.[ch]`
+contain code that is generic over the bit size:
 
   * the RNG state type
   * seeding the RNG
@@ -123,6 +117,13 @@ files: `pcg.[ch]` contain code that is generic over the bit size:
 
 The files `pcg{32,64}_define.h` use macros to configure the generic
 code for 32 bits and 64 bits, respectively.
+
+You can use `make wetter` to generate a version of the source code
+that is easier to copy into your own project. After `make wetter`
+runs, you only need the files:
+
+  * `pcg32.c` `pcg32.h`
+  * `pcg64.c` `pcg64.h`
 
 
 license
