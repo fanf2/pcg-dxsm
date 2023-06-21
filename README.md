@@ -30,7 +30,7 @@ A bare LCG is a bad RNG. PCG turns an LCG into a good RNG:
 
 [The reference implementation of PCG in C++][pcg-cpp] allows you to
 mix and match LCGs and output permutations at a variety of integer
-sizes. This implementation provides just one 32-bit RNG and one 64-bit
+sizes. My implementation provides just one 32-bit RNG and one 64-bit
 RNG.
 
 [pcg-cpp]: https://github.com/imneme/pcg-cpp
@@ -71,6 +71,10 @@ As well as the DXSM output permutation, this `pcg64` variant uses a
 "cheap multiplier", i.e. a 64-bit value half the width of the state,
 instead of a 128-bit value the same width as the state. The same
 multiplier is used for the LCG and the output permutation.
+
+O'Neill wrote [a longer description of the design of pcg64_dxsm][numpy13635].
+
+[numpy13635]: https://github.com/numpy/numpy/issues/13635#issuecomment-506088698
 
 In [C++ PCG][pcg-cpp] its full name is `pcg_engines::cm_setseq_dxsm_128_64`.
 (The C++ PCG typedef `pcg64` still refers to the previously preferred
