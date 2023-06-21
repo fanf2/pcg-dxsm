@@ -16,3 +16,8 @@ pcg64(pcg64_t *rng) {
 	hi *= lo;
 	return (hi);
 }
+
+static inline double
+pcg64_double(pcg64_t *rng) {
+	return ((double)(pcg64(rng) >> 11) * 0x1.0p-53);
+}

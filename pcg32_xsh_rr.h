@@ -10,3 +10,8 @@ pcg32(pcg32_t *rng) {
 	uint32_t rot = (uint32_t)(state >> 59);
 	return ((xor >> (+rot & 31)) | (xor << (-rot & 31)));
 }
+
+static inline float
+pcg32_float(pcg32_t *rng) {
+	return ((float)(pcg32(rng) >> 8) * 0x1.0p-24f);
+}

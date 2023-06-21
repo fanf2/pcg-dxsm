@@ -19,6 +19,11 @@ extern pcg_t pcg_seed(pcg_t seed);
  */
 static inline pcg_uint_t pcg_random(pcg_t *rng);
 
+/*
+ * Get a random floating point number 0.0 <= ... < 1.0
+ */
+static inline pcg_fp_t pcg_fprand(pcg_t *rng);
+
 /* don't call this, call pcg_uniform() */
 extern pcg_uint_t pcg_uniform_slow(
 	pcg_t *rng, pcg_uint_t limit, pcg_ulong_t hi_lo);

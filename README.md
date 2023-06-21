@@ -102,6 +102,9 @@ call, a division, and the rejection sampling loop).
 
 [divisionless]: https://dotat.at/@/2020-10-29-nearly-divisionless-random-numbers.html
 
+There are also `pcg32_float()` and `pcg64_double()` functions that
+generate random numbers in 0.0 <= ... < 1.0 using shift-and-multiply.
+
 
 building
 --------
