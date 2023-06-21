@@ -2,6 +2,7 @@
 
 pcg_t
 pcg_seed(pcg_t rng) {
+	/* must ensure rng.inc is odd */
 	rng.inc = (rng.inc << 1) | 1;
 	rng.state += rng.inc;
 	pcg_random(&rng);
