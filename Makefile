@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: 0BSD OR MIT-0
 
-CFLAGS= -O2 -Weverything -Wno-poison-system-directories
+CFLAGS= -O2 -Wall -Wextra
 
 all: test
 
