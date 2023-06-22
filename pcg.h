@@ -10,7 +10,10 @@ typedef struct pcg_random {
 extern pcg_t pcg_getentropy(void);
 
 /*
- * Seed a random number generator from raw state and inc values.
+ * Properly initialize a random number generator
+ * from raw state and (optional) inc values, e.g.
+ *
+ *	pcg_t rng = pcg_seed((pcg_t){ .state = 0xacab1213 });
  */
 extern pcg_t pcg_seed(pcg_t seed);
 

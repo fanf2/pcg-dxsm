@@ -3,7 +3,7 @@
 pcg_t
 pcg_seed(pcg_t rng) {
 	/* must ensure rng.inc is odd */
-	rng.inc = (rng.inc << 1) | 1;
+	rng.inc = (rng.inc > 0) ? (rng.inc << 1) | 1 : PCG_INCREMENT;
 	rng.state += rng.inc;
 	pcg_random(&rng);
 	return (rng);
