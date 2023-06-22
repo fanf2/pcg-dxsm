@@ -7,7 +7,7 @@ typedef struct pcg_random {
 /*
  * Initialize a random number generator from the kernel's entropy pool
  */
-extern pcg_t pcg_entropy(void);
+extern pcg_t pcg_getentropy(void);
 
 /*
  * Seed a random number generator from raw state and inc values.
@@ -22,19 +22,19 @@ static inline pcg_uint_t pcg_random(pcg_t *rng);
 /*
  * Get a random floating point number 0.0 <= ... < 1.0
  */
-static inline pcg_fp_t pcg_fprand(pcg_t *rng);
+static inline pcg_fp_t pcg_random_fp(pcg_t *rng);
 
-/* don't call this, call pcg_uniform() */
-extern pcg_uint_t pcg_uniform_slow(
+/* don't call this, call pcg_rand() */
+extern pcg_uint_t pcg_rand_slow(
 	pcg_t *rng, pcg_uint_t limit, pcg_ulong_t hi_lo);
 
 /*
  * Get an unbiased random number less than the given limit
  */
 static inline pcg_uint_t
-pcg_uniform(pcg_t *rng, pcg_uint_t limit) {
+pcg_rand(pcg_t *rng, pcg_uint_t limit) {
 	pcg_ulong_t hi_lo = (pcg_ulong_t)pcg_random(rng) * (pcg_ulong_t)limit;
 	if ((pcg_uint_t)(hi_lo) < limit)
-		return (pcg_uniform_slow(rng, limit, hi_lo));
+		return (pcg_rand_slow(rng, limit, hi_lo));
 	return ((pcg_uint_t)(hi_lo >> PCG_UINT_BITS));
 }

@@ -10,7 +10,7 @@ pcg_seed(pcg_t rng) {
 }
 
 pcg_t
-pcg_entropy(void) {
+pcg_getentropy(void) {
 	pcg_t rng;
 	if (getentropy(&rng, sizeof(rng)) < 0)
 		err(1, "getentropy");
@@ -18,7 +18,7 @@ pcg_entropy(void) {
 }
 
 pcg_uint_t
-pcg_uniform_slow(pcg_t *rng, pcg_uint_t limit, pcg_ulong_t hi_lo) {
+pcg_rand_slow(pcg_t *rng, pcg_uint_t limit, pcg_ulong_t hi_lo) {
 	pcg_uint_t residue = -limit % limit;
 	while ((pcg_uint_t)(hi_lo) < residue)
 		hi_lo = (pcg_ulong_t)pcg_random(rng) * (pcg_ulong_t)limit;

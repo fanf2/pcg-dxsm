@@ -7,7 +7,7 @@
 #undef pcg_ulong_t
 #undef pcg_random
 #undef pcg_seed
-#undef pcg_entropy
-#undef pcg_fprand
-#undef pcg_uniform
-#undef pcg_uniform_slow
+#undef pcg_getentropy
+#undef pcg_random_fp
+#undef pcg_rand
+#undef pcg_rand_slow

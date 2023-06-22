@@ -10,10 +10,10 @@
 
 int
 main(void) {
-	pcg32_t rng32 = pcg32_entropy();
-	pcg64_t rng64 = pcg64_entropy();
-	printf("%" PRIu32 "\n", pcg32_uniform(&rng32, INT32_MAX));
-	printf("%" PRIu64 "\n", pcg64_uniform(&rng64, INT64_MAX));
-	printf("%f\n", pcg32_float(&rng32));
-	printf("%f\n", pcg64_double(&rng64));
+	pcg32_t rng32 = pcg32_getentropy();
+	pcg64_t rng64 = pcg64_getentropy();
+	printf("%" PRIu32 "\n", pcg32_rand(&rng32, INT32_MAX));
+	printf("%" PRIu64 "\n", pcg64_rand(&rng64, INT64_MAX));
+	printf("%f\n", pcg32_random_float(&rng32));
+	printf("%f\n", pcg64_random_double(&rng64));
 }

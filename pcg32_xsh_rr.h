@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: 0BSD OR MIT-0
 
 static inline uint32_t
-pcg32(pcg32_t *rng) {
+pcg32_random(pcg32_t *rng) {
 	/* linear congruential generator */
 	uint64_t state = rng->state;
 	rng->state = state * 6364136223846793005ULL + rng->inc;
@@ -12,6 +12,6 @@ pcg32(pcg32_t *rng) {
 }
 
 static inline float
-pcg32_float(pcg32_t *rng) {
-	return ((float)(pcg32(rng) >> 8) * 0x1.0p-24f);
+pcg32_random_float(pcg32_t *rng) {
+	return ((float)(pcg32_random(rng) >> 8) * 0x1.0p-24f);
 }

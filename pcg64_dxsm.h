@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: 0BSD OR MIT-0
 
 static inline uint64_t
-pcg64(pcg64_t *rng) {
+pcg64_random(pcg64_t *rng) {
 	/* cheap (half-width) multiplier */
 	const uint64_t mul = 15750249268501108917ULL;
 	/* linear congruential generator */
@@ -18,6 +18,6 @@ pcg64(pcg64_t *rng) {
 }
 
 static inline double
-pcg64_double(pcg64_t *rng) {
-	return ((double)(pcg64(rng) >> 11) * 0x1.0p-53);
+pcg64_random_double(pcg64_t *rng) {
+	return ((double)(pcg64_random(rng) >> 11) * 0x1.0p-53);
 }
