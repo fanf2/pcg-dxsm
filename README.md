@@ -13,7 +13,7 @@ permuted congruential generator
 -------------------------------
 
 The PCG functions are constructed from a collection of linear
-congruential generators, and a collection of output permutations.
+congruential generators and a collection of output permutations.
 
 A linear congruential random number generator looks like:
 
@@ -117,22 +117,21 @@ building
 
 Type `make`.
 
-The source files in the git repository are fairly DRY: `pcg.[ch]`
-contain code that is generic over the bit size:
+The files `pcg{32,64}.[ch]` are generated. They are designed to be
+self-contained so that you can copy them into your own projects.
+
+The files `pcg32_xsh_rr.c` and `pcg64_dxsm.c` contain the
+size-specific algorithms for generating random integer and floating
+point values.
+
+The files `pcg.[ch]` contain code that is generic over the bit size:
 
   * the RNG state type
   * seeding the RNG
   * Lemire's algorithm
 
-The files `pcg{32,64}_define.h` use macros to configure the generic
+The files `pcg{32,64}.def` contain macros to configure the generic
 code for 32 bits and 64 bits, respectively.
-
-You can use `make wetter` to generate a version of the source code
-that is easier to copy into your own project. After `make wetter`
-runs, you only need the files:
-
-  * `pcg32.c` `pcg32.h`
-  * `pcg64.c` `pcg64.h`
 
 
 license

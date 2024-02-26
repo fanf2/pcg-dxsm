@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: 0BSD OR MIT-0
 
+.SUFFIXES: .c .h .o .def
+
 CFLAGS= -O2 -Wall -Wextra
 
 all: test
-
-wetter: dirty all
 
 clean:
 	rm -f *.o test
@@ -20,23 +20,19 @@ format:
 test: test.c pcg32.o pcg64.o
 
 pcg32.o: pcg32.c pcg32.h
-
 pcg64.o: pcg64.c pcg64.h
+pcg32.c: pcg32.def pcg.c pcg_blurb.c
+pcg64.c: pcg64.def pcg.c pcg_blurb.c
+pcg32.h: pcg32.def pcg.h pcg_blurb.h pcg32_xsh_rr.c
+pcg64.h: pcg64.def pcg.h pcg_blurb.h pcg64_dxsm.c
 
-# expand dry code
+.def.c:
+	cat pcg_blurb.c >$@
+	printf '#include "$*.h"\n\n' >>$@
+	cat $*.def pcg.c |\
+	cc -E - | sed '/^#/d;/^$$/d' | clang-format >>$@
 
-pcg32.h: .cpp .clang-format pcg32_define.h pcg.h pcg32_xsh_rr.h
-	cat .spdx .once >pcg32.h
-	./.cpp pcg32_define.h pcg.h pcg32_xsh_rr.h >>pcg32.h
-
-pcg64.h: .cpp .clang-format pcg64_define.h pcg.h pcg64_dxsm.h
-	cat .spdx .once >pcg64.h
-	./.cpp pcg64_define.h pcg.h pcg64_dxsm.h >>pcg64.h
-
-pcg32.c: .cpp .clang-format pcg32_define.h .pcg32.h pcg.c
-	cat .spdx pcg_include.h .pcg32.h >pcg32.c
-	./.cpp pcg32_define.h pcg.c >>pcg32.c
-
-pcg64.c: .cpp .clang-format pcg64_define.h .pcg64.h pcg.c
-	cat .spdx pcg_include.h .pcg64.h >pcg64.c
-	./.cpp pcg64_define.h pcg.c >>pcg64.c
+.def.h:
+	cat pcg_blurb.h >$@
+	cat $*.def pcg.h $*_*.c |\
+	cc -E - | sed '/^#/d;/^$$/d' | clang-format >>$@
