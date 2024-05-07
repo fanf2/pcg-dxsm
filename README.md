@@ -4,7 +4,8 @@ Uniform random numbers with PCG
 This repository contains implementations in C of the preferred 32-bit
 and 64-bit variants of [Melissa O'Neill's PCG family of random number
 algorithms][pcg], with Daniel Lemire's nearly-divisionless algorithm
-for unbiased bounded random numbers.
+for unbiased bounded random numbers, and functions for random floating
+point numbers.
 
 [pcg]: https://www.pcg-random.org/
 
@@ -39,7 +40,7 @@ RNG.
 pcg32
 -----
 
-The file `pcg32_xsh_rr.h` contains the preferred 32-bit variant of
+The file `pcg32_xsh_rr.c` contains the preferred 32-bit variant of
 PCG. The output permutation's name "XSH RR" is short for "xor shift
 rotate right".
 
@@ -53,11 +54,12 @@ It is the only variant provided by the [basic C PCG][pcg-basic].
 pcg64
 -----
 
-The file `pcg64_dxsm.h` contains the preferred 64-bit variant of PCG.
+The file `pcg64_dxsm.c` contains the preferred 64-bit variant of PCG.
 It is harder to find out about it on [the PCG web site][pcg], though
-it is increasingly popular. [Melissa O'Neill describes it as
-follows][pcg-dxsm]:
+it is [increasingly popular][dotat-dxsm]. [Melissa O'Neill describes
+it as follows][pcg-dxsm]:
 
+[dotat-dxsm]: https://dotat.at/@/2023-06-21-pcg64-dxsm.html
 [pcg-dxsm]: https://github.com/imneme/pcg-cpp/commit/871d0494ee9c9a7b7c43f753e3d8ca47c26f8005
 
 > DXSM -- double xor shift multiply
@@ -67,32 +69,19 @@ follows][pcg-dxsm]:
 > types.  Although primarily intended for use at large sizes, also works
 > at smaller sizes as well.
 
+O'Neill wrote [a longer description of the design of pcg64_dxsm][numpy13635]
+elsewhere.
+
+[numpy13635]: https://github.com/numpy/numpy/issues/13635#issuecomment-506088698
+
 As well as the DXSM output permutation, this `pcg64` variant uses a
 "cheap multiplier", i.e. a 64-bit value half the width of the state,
 instead of a 128-bit value the same width as the state. The same
 multiplier is used for the LCG and the output permutation.
 
-O'Neill wrote [a longer description of the design of pcg64_dxsm][numpy13635].
-
-[numpy13635]: https://github.com/numpy/numpy/issues/13635#issuecomment-506088698
-
 In [C++ PCG][pcg-cpp] its full name is `pcg_engines::cm_setseq_dxsm_128_64`.
 (The C++ PCG typedef `pcg64` still refers to the previously preferred
 `xsl_rr` variant.)
-
-In [the Rust `rand_pcg` crate][rust] it is called `Lcg128CmDxsm64`,
-i.e. a linear congruential generator with 128 bits of state and a
-cheap multiplier, using the DXSM permutation with 64 bits of output.
-
-[rust]: https://rust-random.github.io/rand/rand_pcg/
-
-PCG64DXSM is the default random number generator in NumPy; The NumPy
-documentation discusses [how PCG64DXSM improves on the older
-PCG64][numpy]. It is proposed to use `pcg64-dxsm` in [the revamp of
-Golang's standard library random number API][golang].
-
-[golang]: https://github.com/golang/go/discussions/60751
-[numpy]: https://numpy.org/devdocs/reference/random/upgrading-pcg64.html
 
 
 unbiased bounded random numbers
@@ -109,7 +98,9 @@ a division, and the rejection sampling loop).
 
 There are also `pcg32_random_float()` and `pcg64_random_double()`
 functions that generate random numbers in 0.0 <= ... < 1.0 using
-shift-and-multiply.
+[shift-cast-and-multiply][rand-float].
+
+[rand-float]: https://dotat.at/@/2023-06-23-random-double.html
 
 
 building
