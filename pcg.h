@@ -27,13 +27,15 @@ static inline pcg_uint_t pcg_random(pcg_t *rng);
  */
 static inline pcg_fp_t pcg_random_fp(pcg_t *rng);
 
+/*
+ * Get an unbiased random number less than the given limit
+ */
+static inline pcg_uint_t pcg_rand(pcg_t *rng, pcg_uint_t limit);
+
 /* don't call this, call pcg_rand() */
 extern pcg_uint_t pcg_rand_slow(
 	pcg_t *rng, pcg_uint_t limit, pcg_ulong_t hi_lo);
 
-/*
- * Get an unbiased random number less than the given limit
- */
 static inline pcg_uint_t
 pcg_rand(pcg_t *rng, pcg_uint_t limit) {
 	pcg_ulong_t hi_lo = (pcg_ulong_t)pcg_random(rng) * (pcg_ulong_t)limit;
