@@ -39,7 +39,7 @@ extern pcg_uint_t pcg_rand_slow(
 static inline pcg_uint_t
 pcg_rand(pcg_t *rng, pcg_uint_t limit) {
 	pcg_ulong_t hi_lo = (pcg_ulong_t)pcg_random(rng) * (pcg_ulong_t)limit;
-	if ((pcg_uint_t)(hi_lo) < limit)
+	if ((limit & (limit - 1)) > 0 && (pcg_uint_t)(hi_lo) < limit)
 		return (pcg_rand_slow(rng, limit, hi_lo));
 	return ((pcg_uint_t)(hi_lo >> PCG_UINT_BITS));
 }
