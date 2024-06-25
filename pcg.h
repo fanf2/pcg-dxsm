@@ -32,13 +32,14 @@ static inline pcg_fp_t pcg_random_fp(pcg_t *rng);
  */
 extern pcg_uint_t pcg_rand(pcg_t *rng, pcg_uint_t limit);
 
-/* don't call this, call pcg_rand() */
-extern pcg_uint_t pcg_rand_slow(
-	pcg_t *rng, pcg_uint_t limit, pcg_ulong_t hi_lo);
-
-/* don't call this, call pcg_rand_fast() */
+/*
+ * The macro pcg_rand_fast(rng, limit) is like pcg_rand(rng, limit)
+ * but the fast path is inlined. Don't call pcg_rand_inline() directly.
+ */
 static inline pcg_uint_t
 pcg_rand_inline(pcg_t *rng, pcg_uint_t limit, pcg_uint_t maybe_slow) {
+	extern pcg_uint_t pcg_rand_slow(
+		pcg_t *rng, pcg_uint_t limit, pcg_ulong_t hi_lo);
 	pcg_ulong_t hi_lo = (pcg_ulong_t)pcg_random(rng) * (pcg_ulong_t)limit;
 	if (maybe_slow && (pcg_uint_t)(hi_lo) < limit)
 		return (pcg_rand_slow(rng, limit, hi_lo));
