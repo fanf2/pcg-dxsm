@@ -18,6 +18,11 @@ pcg_getentropy(void) {
 }
 
 pcg_uint_t
+pcg_rand(pcg_t *rng, pcg_uint_t limit) {
+	return (pcg_rand_fast(rng, limit));
+}
+
+pcg_uint_t
 pcg_rand_slow(pcg_t *rng, pcg_uint_t limit, pcg_ulong_t hi_lo) {
 	pcg_uint_t residue = -limit % limit;
 	while ((pcg_uint_t)(hi_lo) < residue)
