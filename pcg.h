@@ -32,6 +32,9 @@ static inline pcg_fp_t pcg_random_fp(pcg_t *rng);
  */
 extern pcg_uint_t pcg_rand(pcg_t *rng, pcg_uint_t limit);
 
+/* inline version of pcg_rand() */
+static inline pcg_uint_t pcg_rand_fast(pcg_t *rng, pcg_uint_t limit);
+
 /* don't call this, call pcg_rand() */
 extern pcg_uint_t pcg_rand_slow(
 	pcg_t *rng, pcg_uint_t limit, pcg_ulong_t hi_lo);
@@ -41,7 +44,6 @@ extern pcg_uint_t pcg_rand_slow(
 	_Generic(0 ? (long *)(1) : (void *)(0 * (long)(x)), \
 		 long *: 1, void *: 0)
 
-/* inline version of pcg_rand() */
 static inline pcg_uint_t
 pcg_rand_fast(pcg_t *rng, pcg_uint_t limit) {
 	if (pcg_is_constant(limit) && (limit & (limit - 1)) == 0)
