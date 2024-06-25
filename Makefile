@@ -33,6 +33,6 @@ pcg64.h: pcg64.def pcg.h pcg_blurb.h pcg64_dxsm.c
 	cc -E - | sed '/^#/d;/^$$/d' | clang-format >>$@
 
 .def.h:
-	cat pcg_blurb.h >$@
+	sed s/pcg/$*/g pcg_blurb.h >$@
 	cat $*.def pcg.h $*_*.c |\
 	cc -E - | sed '/^#/d;/^$$/d' | clang-format >>$@
