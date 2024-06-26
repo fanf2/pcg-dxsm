@@ -93,6 +93,16 @@ rejection sampling algorithm for bounded random
 numbers][divisionless]. In this implementation [the algorithm is split
 into an inline fast path and a separate slow path][split].
 
+Arcane tricks are used to completely omit the slow path when possible.
+The expression `limit & limit - 1` is zero when the limit is a power
+of two or zero; when it is cast to `void *` it is either a null
+pointer constant (always fast) or not (maybe slow). The type of a `?:`
+expression with a `void *` branch and another pointer branch is
+usually `void *`, unless the `void *` is a null pointer constant, in
+which case the `?:` type is the other pointer type. A `_Generic()`
+expression can turn the type of the `?:` into a boolean value
+indicating whether the limit is always fast or maybe slow.
+
 [divisionless]: https://dotat.at/@/2020-10-29-nearly-divisionless-random-numbers.html
 [split]: https://dotat.at/@/2024-06-25-lemire-inline.html
 
