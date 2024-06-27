@@ -29,3 +29,17 @@ pcg_rand_slow(pcg_t *rng, pcg_uint_t limit, pcg_ulong_t hi_lo) {
 		hi_lo = (pcg_ulong_t)pcg_random(rng) * (pcg_ulong_t)limit;
 	return ((pcg_uint_t)(hi_lo >> PCG_UINT_BITS));
 }
+
+void
+pcg_random_bytes(pcg_t *restrict rng, void *restrict ptr, size_t size) {
+	while (size > sizeof(pcg_uint_t)) {
+		pcg_uint_t rand = pcg_random(rng);
+		memcpy(ptr, &rand, sizeof(pcg_uint_t));
+		ptr += sizeof(pcg_uint_t);
+		size -= sizeof(pcg_uint_t);
+	}
+	if (size > 0) {
+		pcg_uint_t rand = pcg_random(rng);
+		memcpy(ptr, &rand, size);
+	}
+}

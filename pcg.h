@@ -28,6 +28,12 @@ static inline pcg_uint_t pcg_random(pcg_t *rng);
 static inline pcg_fp_t pcg_random_fp(pcg_t *rng);
 
 /*
+ * Write `size` random bytes at `ptr`
+ */
+extern void pcg_random_bytes(
+	pcg_t *restrict rng, void *restrict ptr, size_t size);
+
+/*
  * Get an unbiased random number less than the given limit
  */
 extern pcg_uint_t pcg_rand(pcg_t *rng, pcg_uint_t limit);

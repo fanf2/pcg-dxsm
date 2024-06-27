@@ -2,5 +2,6 @@
 
 #include <err.h>
 #include <stdint.h>
+#include <string.h>
 #include <sys/random.h>
 
