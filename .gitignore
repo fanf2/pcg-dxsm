@@ -1,3 +1,4 @@
+pcg6432.a
 pcg32.[ch]
 pcg64.[ch]
 *.o
