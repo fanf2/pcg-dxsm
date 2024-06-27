@@ -132,7 +132,12 @@ The files `pcg.[ch]` contain code that is generic over the bit size:
   * Lemire's algorithm
 
 The files `pcg{32,64}.def` contain macros to configure the generic
-code for 32 bits and 64 bits, respectively.
+code for 32 bits and 64 bits, respectively. The files `pcg_blurb.[ch]`
+are the prefixes of the generated files.
+
+The file `shuffle.c` contains a Fisher-Yates shuffle using pcg32 and
+Lemire's algorithm. Internally it uses pcg64 to shuffle very large
+arrays.
 
 
 license
