@@ -26,7 +26,8 @@ test_shuffle(pcg32_t *rng) {
 	bool sorted = true;
 	for (uint32_t i = 0; i < LARGER; i++) {
 		sum -= a[i];
-		if (a[i] != i) sorted = false;
+		if (a[i] != i)
+			sorted = false;
 	}
 	assert(sum == 0);
 	assert(sorted == false);

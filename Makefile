@@ -7,6 +7,9 @@ CFLAGS= -O2 -Wall -Wextra
 OBJ = pcg32.o pcg64.o shuffle.o
 
 all: test
+	./test
+
+test: test.c pcg6432.a
 
 clean:
 	rm -f ${OBJ} pcg6432.a test
@@ -16,10 +19,6 @@ dirty:
 
 format:
 	clang-format -i *.[ch]
-
-# normal build
-
-test: test.c pcg6432.a
 
 pcg6432.a: ${OBJ}
 	ar -rcs pcg6432.a ${OBJ}
@@ -33,12 +32,12 @@ pcg64.h: pcg64.def pcg.h pcg_blurb.h pcg64_dxsm.c
 shuffle.o: shuffle.c pcg32.h pcg64.h
 
 .def.c:
-	cat pcg_blurb.c >$@
+	sed '/^\/\*/d' pcg_blurb.c >$@
 	printf '#include "$*.h"\n\n' >>$@
 	cat $*.def pcg.c |\
 	cc -E - | sed '/^#/d;/^$$/d' | clang-format >>$@
 
 .def.h:
-	sed s/pcg/$*/g pcg_blurb.h >$@
+	sed 's/pcg/$*/g;/^[ /]\*/d' pcg_blurb.h >$@
 	cat $*.def pcg.h $*_*.c |\
 	cc -E - | sed '/^#/d;/^$$/d' | clang-format >>$@

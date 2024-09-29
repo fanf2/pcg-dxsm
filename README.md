@@ -46,7 +46,7 @@ rotate right".
 
 In [C++ PCG][pcg-cpp] this variant is called
 `pcg_engines::setseq_xsh_rr_64_32` or simply `pcg32` for short.
-It is the only variant provided by the [basic C PCG][pcg-basic].
+It is the only variant provided by O'Neill's [basic C PCG][pcg-basic].
 
 [pcg-basic]: https://github.com/imneme/pcg-c-basic
 

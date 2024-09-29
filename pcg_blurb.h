@@ -7,3 +7,4 @@
 		_Generic(0 ? (void *)(long)((limit) & ((limit) - 1)) \
 			   : (long *) 0, long *: 0, void *: 1))
 
+/**/
