@@ -18,6 +18,6 @@ pcg64_random(pcg64_t *rng) {
 }
 
 static inline double
-pcg64_random_double(pcg64_t *rng) {
+pcg64_double(pcg64_t *rng) {
 	return ((double)(pcg64_random(rng) >> 11) * 0x1.0p-53);
 }

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: 0BSD OR MIT-0
 
-typedef struct pcg_random {
+typedef struct pcg {
 	pcg_ulong_t state, inc;
 } pcg_t;
 
@@ -25,13 +25,12 @@ static inline pcg_uint_t pcg_random(pcg_t *rng);
 /*
  * Get a random floating point number 0.0 <= ... < 1.0
  */
-static inline pcg_fp_t pcg_random_fp(pcg_t *rng);
+static inline pcg_fp_t pcg_fp(pcg_t *rng);
 
 /*
  * Write `size` random bytes at `ptr`
  */
-extern void pcg_random_bytes(
-	pcg_t *restrict rng, void *restrict ptr, size_t size);
+extern void pcg_bytes(pcg_t *restrict rng, void *restrict ptr, size_t size);
 
 /*
  * Get an unbiased random number less than the given limit

@@ -31,7 +31,7 @@ pcg_rand_slow(pcg_t *rng, pcg_uint_t limit, pcg_ulong_t hi_lo) {
 }
 
 void
-pcg_random_bytes(pcg_t *restrict rng, void *restrict vptr, size_t size) {
+pcg_bytes(pcg_t *restrict rng, void *restrict vptr, size_t size) {
 	uint8_t *ptr = vptr;
 	while (size > sizeof(pcg_uint_t)) {
 		pcg_uint_t rand = pcg_random(rng);

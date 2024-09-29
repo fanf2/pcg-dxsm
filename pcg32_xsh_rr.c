@@ -12,7 +12,7 @@ pcg32_random(pcg32_t *rng) {
 }
 
 static inline float
-pcg32_random_float(pcg32_t *rng) {
+pcg32_float(pcg32_t *rng) {
 	return ((float)(pcg32_random(rng) >> 8) * 0x1.0p-24f);
 }
 

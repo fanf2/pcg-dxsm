@@ -22,7 +22,7 @@ pcg32_shuffle(pcg32_t *restrict rng32,
 	pcg64_t pcg64, *rng64 = &pcg64;
 	uint8_t *base = ptr;
 	if (count > LARGE) {
-		pcg32_random_bytes(rng32, &pcg64, sizeof(pcg64));
+		pcg32_bytes(rng32, &pcg64, sizeof(pcg64));
 		pcg64 = pcg64_seed(pcg64);
 	}
 	while (count > LARGE) {
