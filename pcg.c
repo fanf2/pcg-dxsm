@@ -43,14 +43,14 @@ pcg_rand(pcg_t *rng, pcg_uint_t limit) {
 /*
  * Slow path called from pcg_rand_inline().
  *
- * The `range` of possible values returned by pcg_random() is the same as
- * the number of possible `sample` values. We will return a result if the
- * `sample` is one of `yield` possible values, where `yield` is the largest
- * multiple of `limit` less than `range`. We ensure our results will be
- * unbiased by mapping `yield / limit` possible sample values to each of
- * the `limit` possible return values. If the `sample` is one of the
- * remainder, we `reject` it and resample. The largest multiple makes
- * resampling as rare as possible.
+ * The number of possible `sample` values is the same as the `range` of
+ * possible values returned by pcg_random(). We will return a result if
+ * the `sample` is one of `yield` possible values, where `yield` is the
+ * largest multiple of `limit` less than `range`. (The largest multiple
+ * makes resampling as rare as possible.) We ensure our results will be
+ * unbiased by mapping `yield / limit` of the possible sample values to
+ * each of the `limit` possible return values. When the `sample` is one
+ * of the remainder, we `reject` it and resample.
  *
  *	range = 1 << PCG_UINT_BITS
  *	reject = range % limit
@@ -74,12 +74,9 @@ pcg_rand_slow(pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample) {
 	 * Consider separately the set H of possible values of the high word
 	 * of the sample, and the set L of possible values of the low word of
 	 * the sample. H = { h | 0 <= h < limit }, the set of values we can
-	 * return; L is more complicated.
-	 *
-	 * Because the sample is multiplied by `limit`, the values in L are
-	 * spaced apart equally by `limit`. However, because `limit` does not
-	 * evenly divide `range`, the set L differs for different H values:
-	 * the min and the max in L vary.
+	 * return. All we need to know about L is its values are spaced apart
+	 * equally by `limit` because the sample is multiplied by `limit`
+	 * (though the min and max in L vary depending on the value of H).
 	 *
 	 * Split the `range` covering L into two spans of size `reject` and
 	 * `yield`. The `yield` span always covers exactly `yield / limit`
