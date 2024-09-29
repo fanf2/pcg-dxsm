@@ -38,15 +38,33 @@ extern void pcg_bytes(pcg_t *restrict rng, void *restrict ptr, size_t size);
 extern pcg_uint_t pcg_rand(pcg_t *rng, pcg_uint_t limit);
 
 /*
- * The macro pcg_rand_fast(rng, limit) is like pcg_rand(rng, limit)
- * but the fast path is inlined. Don't call pcg_rand_inline() directly.
+ * The macro pcg_rand_fast(rng, limit) defined in "pcg_blurb.h" is
+ * like pcg_rand(rng, limit) but the fast path is inlined.
+ *
+ * Don't call pcg_rand_inline() directly, call pcg_rand_fast().
  */
 static inline pcg_uint_t
-pcg_rand_inline(pcg_t *rng, pcg_uint_t limit, pcg_uint_t maybe_slow) {
+pcg_rand_inline(pcg_t *rng, pcg_uint_t limit, int maybe_slow) {
 	extern pcg_uint_t pcg_rand_slow(
-		pcg_t *rng, pcg_uint_t limit, pcg_ulong_t hi_lo);
-	pcg_ulong_t hi_lo = (pcg_ulong_t)pcg_random(rng) * (pcg_ulong_t)limit;
-	if (maybe_slow && (pcg_uint_t)(hi_lo) < limit)
-		return (pcg_rand_slow(rng, limit, hi_lo));
-	return ((pcg_uint_t)(hi_lo >> PCG_UINT_BITS));
+		pcg_t * rng, pcg_uint_t limit, pcg_ulong_t sample);
+	/*
+	 * Daniel Lemire's nearly-divisionless unbiased bounded random numbers.
+	 *
+	 * We get a value W = PCG_UINT_BITS wide from pcg_random(). We can
+	 * think of it as a 0.W bit fixed-point value less than 1.0. When
+	 * we do a double-width multiply by the limit, we get a W.W bit
+	 * fixed-point value less than the limit. Our result will be the
+	 * integer part (upper W bits), and we will use the fraction part
+	 * (lower W bits) to determine whether or not we need to resample.
+	 */
+	pcg_ulong_t sample = (pcg_ulong_t)pcg_random(rng) * (pcg_ulong_t)limit;
+	/*
+	 * The compile-time value maybe_slow is false when the integer part
+	 * of the sample is trivially unbiased. The slow path will calculate
+	 * the resample threshold using `% limit`; we can avoid the `%` by
+	 * using `limit` as a slight over-estimate of the exact threshold.
+	 */
+	if (maybe_slow && (pcg_uint_t)(sample) < limit)
+		return (pcg_rand_slow(rng, limit, sample));
+	return ((pcg_uint_t)(sample >> PCG_UINT_BITS));
 }
