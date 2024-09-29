@@ -12,8 +12,8 @@ pcg_seed(pcg_t rng) {
 pcg_t
 pcg_getentropy(void) {
 	pcg_t rng;
-	if (getentropy(&rng, sizeof(rng)) < 0)
-		err(1, "getentropy");
+        int getentropy_return = getentropy(&rng, sizeof(rng));
+	assert(getentropy_return == 0);
 	return (pcg_seed(rng));
 }
 
