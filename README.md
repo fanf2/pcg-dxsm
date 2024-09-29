@@ -70,7 +70,7 @@ pcg32
 
 The file `pcg32_xsh_rr.c` contains the preferred 32-bit variant of
 PCG. The output permutation's name "XSH RR" is short for "xor shift
-rotate right".
+random rotate".
 
 In [C++ PCG][pcg-cpp] this variant is called
 `pcg_engines::setseq_xsh_rr_64_32` or simply `pcg32` for short.
