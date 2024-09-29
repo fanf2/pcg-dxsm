@@ -10,6 +10,34 @@ point numbers.
 [pcg]: https://www.pcg-random.org/
 
 
+guided tour
+-----------
+
+Type `make`.
+
+The files `pcg{32,64}.[ch]` are generated. They are designed to be
+self-contained so that you can copy them into your own projects.
+Documentation and commentary is stripped out.
+
+The files `pcg32_xsh_rr.c` and `pcg64_dxsm.c` contain the
+size-specific algorithms for generating random integer and floating
+point values.
+
+The files `pcg.[ch]` contain code that is generic over the bit size:
+
+  * the RNG state type
+  * seeding the RNG
+  * Lemire's algorithm
+
+The files `pcg{32,64}.def` contain macros to configure the generic
+code for 32 bits and 64 bits, respectively. The files `pcg_blurb.[ch]`
+are the prefixes of the generated files.
+
+The file `shuffle.c` contains a Fisher-Yates shuffle using pcg32 and
+Lemire's algorithm. Internally it uses pcg64 to shuffle very large
+arrays.
+
+
 permuted congruential generator
 -------------------------------
 
@@ -100,33 +128,6 @@ functions that generate random numbers in 0.0 <= ... < 1.0 using
 [divisionless]: https://dotat.at/@/2020-10-29-nearly-divisionless-random-numbers.html
 [split]: https://dotat.at/@/2024-06-25-lemire-inline.html
 [rand-float]: https://dotat.at/@/2023-06-23-random-double.html
-
-
-building
---------
-
-Type `make`.
-
-The files `pcg{32,64}.[ch]` are generated. They are designed to be
-self-contained so that you can copy them into your own projects.
-
-The files `pcg32_xsh_rr.c` and `pcg64_dxsm.c` contain the
-size-specific algorithms for generating random integer and floating
-point values.
-
-The files `pcg.[ch]` contain code that is generic over the bit size:
-
-  * the RNG state type
-  * seeding the RNG
-  * Lemire's algorithm
-
-The files `pcg{32,64}.def` contain macros to configure the generic
-code for 32 bits and 64 bits, respectively. The files `pcg_blurb.[ch]`
-are the prefixes of the generated files.
-
-The file `shuffle.c` contains a Fisher-Yates shuffle using pcg32 and
-Lemire's algorithm. Internally it uses pcg64 to shuffle very large
-arrays.
 
 
 license
