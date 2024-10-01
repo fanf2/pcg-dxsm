@@ -2,8 +2,9 @@
 
 pcg_t
 pcg_seed(pcg_t rng) {
+	const pcg_ulong_t inc = PCG_INCREMENT;
 	/* must ensure rng.inc is odd */
-	rng.inc = (rng.inc > 0) ? (rng.inc << 1) | 1 : PCG_INCREMENT;
+	rng.inc = (rng.inc > 0) ? (rng.inc << 1) | 1 : inc;
 	rng.state += rng.inc;
 	pcg_random(&rng);
 	return (rng);
