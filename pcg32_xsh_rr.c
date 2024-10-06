@@ -15,6 +15,3 @@ static inline float
 pcg32_float(pcg32_t *rng) {
 	return ((float)(pcg32_random(rng) >> 8) * 0x1.0p-24f);
 }
-
-extern void pcg32_shuffle(
-	pcg32_t *restrict rng, void *restrict ptr, size_t count, size_t size);

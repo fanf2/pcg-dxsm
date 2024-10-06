@@ -13,7 +13,30 @@
 #define LARGER (1 << 24)
 
 static void
-test_shuffle(pcg32_t *rng) {
+test_shuffle64(void) {
+	/* pcg64 has 256 bits of state; 2^256 == 10^77 > 10^68 == 52! */
+	size_t suits = 4;
+	size_t ranks = 13;
+	size_t count = suits * ranks;
+	char deck[] =
+		" A♣︎ 2♣︎ 3♣︎ 4♣︎ 5♣︎ 6♣︎ 7♣︎ 8♣︎ 9♣︎ 0♣︎ J♣︎ Q♣︎ K♣︎"
+		" A♦︎ 2♦︎ 3♦︎ 4♦︎ 5♦︎ 6♦︎ 7♦︎ 8♦︎ 9♦︎ 0♦︎ J♦︎ Q♦︎ K♦︎"
+		" A♥︎ 2♥︎ 3♥︎ 4♥︎ 5♥︎ 6♥︎ 7♥︎ 8♥︎ 9♥︎ 0♥︎ J♥︎ Q♥︎ K♥︎"
+		" A♠︎ 2♠︎ 3♠︎ 4♠︎ 5♠︎ 6♠︎ 7♠︎ 8♠︎ 9♠︎ 0♠︎ J♠︎ Q♠︎ K♠︎";
+	size_t len = sizeof(deck) - 1;
+	size_t size = len / count;
+	pcg64_shuffle((pcg64_t[]){ pcg64_getentropy() }, deck, count, size);
+	for (size_t suit = 0; suit < suits; suit++) {
+		char *row = deck + suit * ranks * size;
+		for (size_t rank = 0; rank < ranks; rank++) {
+			printf("%.*s", (int)size, row + rank * size);
+		}
+		printf("\n");
+	}
+}
+
+static void
+test_shuffle32(pcg32_t *rng) {
 	uint32_t *a;
 	a = malloc(LARGER * sizeof(*a));
 	assert(a != NULL);
@@ -50,5 +73,6 @@ main(void) {
 	printf("slow %" PRIX64 "\n", pcg64_rand(&rng64, INT64_MAX));
 	printf("fp %.16f\n", pcg64_double(&rng64));
 
-	test_shuffle(&rng32);
+	test_shuffle32(&rng32);
+	test_shuffle64();
 }

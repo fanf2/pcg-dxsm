@@ -17,6 +17,17 @@ memswap(void *aa, void *bb, size_t size) {
 }
 
 void
+pcg64_shuffle(pcg64_t *restrict rng64,
+	      void *restrict ptr, size_t count, size_t size) {
+	uint8_t *base = ptr;
+	while (count > 1) {
+		void *mid = base + size * pcg64_rand_fast(rng64, count);
+		void *top = base + size * --count;
+		memswap(mid, top, size);
+	}
+}
+
+void
 pcg32_shuffle(pcg32_t *restrict rng32,
 	      void *restrict ptr, size_t count, size_t size) {
 	pcg64_t pcg64, *rng64 = &pcg64;

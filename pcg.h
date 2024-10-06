@@ -33,6 +33,12 @@ static inline pcg_fp_t pcg_fp(pcg_t *rng);
 extern void pcg_bytes(pcg_t *restrict rng, void *restrict ptr, size_t size);
 
 /*
+ * Shuffle the array `ptr` containing `count` objects of size `size`
+ */
+extern void pcg_shuffle(
+	pcg_t *restrict rng, void *restrict ptr, size_t count, size_t size);
+
+/*
  * Get an unbiased random number less than the given limit
  */
 extern pcg_uint_t pcg_rand(pcg_t *rng, pcg_uint_t limit);
@@ -46,7 +52,7 @@ extern pcg_uint_t pcg_rand(pcg_t *rng, pcg_uint_t limit);
 static inline pcg_uint_t
 pcg_rand_inline(pcg_t *rng, pcg_uint_t limit, int maybe_slow) {
 	extern pcg_uint_t pcg_rand_slow(
-		pcg_t * rng, pcg_uint_t limit, pcg_ulong_t sample);
+		pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample);
 	/*
 	 * Get a value W = PCG_UINT_BITS wide from pcg_random(). We can think
 	 * of it as a 0.W bit fixed-point value less than 1.0. When we do a
