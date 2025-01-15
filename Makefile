@@ -1,8 +1,11 @@
 # SPDX-License-Identifier: 0BSD OR MIT-0
 
+.POSIX:
+.PHONY: all test clean dirty format
 .SUFFIXES: .c .h .o .def
 
-CFLAGS= -O2 -Wall -Wextra
+CFLAGS= -Os -Wall -Wextra
+ARFLAGS= -rcs
 
 OBJ = pcg32.o pcg64.o shuffle.o
 
@@ -21,7 +24,7 @@ format:
 	clang-format -i *.[ch]
 
 pcg6432.a: ${OBJ}
-	ar -rcs pcg6432.a ${OBJ}
+	${AR} ${ARFLAGS} $@ ${OBJ}
 
 pcg32.o: pcg32.c pcg32.h
 pcg64.o: pcg64.c pcg64.h
