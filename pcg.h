@@ -63,10 +63,11 @@ pcg_rand_inline(pcg_t *rng, pcg_uint_t limit, int maybe_slow) {
 	 */
 	pcg_ulong_t sample = (pcg_ulong_t)pcg_random(rng) * (pcg_ulong_t)limit;
 	/*
-	 * The compile-time value maybe_slow is false when the integer part
-	 * of the sample is trivially unbiased. The slow path will calculate
-	 * the resample threshold using `% limit`; we can avoid the `%` by
-	 * using `limit` as a slight over-estimate of the exact threshold.
+	 * Return this sample if it is definitely unbiased. The compile-time
+	 * value maybe_slow is false when the sample cannot be biased, else use
+	 * `limit` as a fast over-estimate for the reject threshold. In the
+	 * slow path we calculate the exact threshold with `% limit`, re-check
+	 * and return this sample if it passes, or re-try with another sample.
 	 */
 	if (maybe_slow && (pcg_uint_t)(sample) < limit)
 		return (pcg_rand_slow(rng, limit, sample));

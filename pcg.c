@@ -42,20 +42,22 @@ pcg_rand(pcg_t *rng, pcg_uint_t limit) {
 }
 
 /*
- * Slow path called from pcg_rand_inline().
+ * Slow path called from pcg_rand_inline(). Re-check and return `sample`
+ * if it passes, or re-try with a new sample.
+ *
+ *	range = 1 << PCG_UINT_BITS
+ *	reject = range % limit
+ *	yield = range - reject
+ *	quota = yield / limit
  *
  * The number of possible `sample` values is the same as the `range` of
  * possible values returned by pcg_random(). We will return a result if
  * the `sample` is one of `yield` possible values, where `yield` is the
  * largest multiple of `limit` less than `range`. (The largest multiple
  * makes resampling as rare as possible.) We ensure our results will be
- * unbiased by mapping `yield / limit` of the possible sample values to
- * each of the `limit` possible return values. When the `sample` is one
- * of the remainder, we `reject` it and resample.
- *
- *	range = 1 << PCG_UINT_BITS
- *	reject = range % limit
- *	yield = range - reject
+ * unbiased by mapping `quota` of the possible sample values to each of
+ * the `limit` possible return values. When the `sample` is over-quota,
+ * it is one of the `reject` values that cause a re-try.
  */
 pcg_uint_t
 pcg_rand_slow(pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample) {
@@ -72,19 +74,21 @@ pcg_rand_slow(pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample) {
 	 */
 	pcg_uint_t reject = -limit % limit;
 	/*
-	 * Consider separately the set H of possible values of the high word
-	 * of the sample, and the set L of possible values of the low word of
-	 * the sample. H = { h | 0 <= h < limit }, the set of values we can
-	 * return. All we need to know about L is its values are spaced apart
-	 * equally by `limit` because the sample is multiplied by `limit`
-	 * (though the min and max in L vary depending on the value of H).
+	 * The upper half of `sample` has `limit` possible values; for each
+	 * upper-half value U, the lower half has a value of the form
 	 *
-	 * Split the `range` covering L into two spans of size `reject` and
-	 * `yield`. The `yield` span always covers exactly `yield / limit`
-	 * values spaced apart by `limit`, regardless of their min and max.
-	 * This is what we wanted for an unbiased result, so if our L value
-	 * lands in the `yield` span outside the `reject` span, we return
-	 * our H value; while it's inside the `reject` span we resample.
+	 *	L = a + b * limit
+	 *
+	 * Lower-half values are spaced `limit` apart by the multiplication.
+	 * Depending on U, `b` (and therefore L) has `quota` or `quota + 1`
+	 * possible values. The alignment `a` is determined by U.
+	 *
+	 * We split the `range` covering L into two spans of size `yield`
+	 * and `reject`. The `yield` span is a multiple of `limit` so it
+	 * always covers exactly `quota` possible values of L, regardless
+	 * of the alignment; we return these unbiased samples. For some
+	 * values of U, one over-quota value of L can also fall in the
+	 * `reject` span; when we get one of these samples we re-try.
 	 */
 	while ((pcg_uint_t)(sample) < reject)
 		sample = (pcg_ulong_t)pcg_random(rng) * (pcg_ulong_t)limit;
