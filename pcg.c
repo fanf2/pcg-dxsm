@@ -1,14 +1,5 @@
 // SPDX-License-Identifier: 0BSD OR MIT-0
 
-static inline void
-memswap(void *aa, void *bb, size_t size) {
-	for (uint8_t *a = aa, *b = bb; size-- > 0; a++, b++) {
-		uint8_t c = *a;
-		*a = *b;
-		*b = c;
-	}
-}
-
 pcg_t
 pcg_seed(pcg_t rng) {
 	const pcg_ulong_t inc = PCG_INCREMENT;
@@ -48,9 +39,13 @@ pcg_shuffle(
 ) {
 	uint8_t *base = ptr;
 	while (count > 1) {
-		void *mid = base + size * pcg_rand_fast(rng, count);
-		void *top = base + size * --count;
-		memswap(mid, top, size);
+		uint8_t *mid = base + size * pcg_rand_fast(rng, count);
+		uint8_t *top = base + size * --count;
+		for (size_t i = 0; i < size; i++) {
+			uint8_t swap = mid[i];
+			mid[i] = top[i];
+			top[i] = swap;
+		}
 	}
 }
 
