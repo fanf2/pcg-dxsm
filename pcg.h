@@ -36,7 +36,7 @@ extern void pcg_bytes(pcg_t *restrict rng, void *restrict ptr, size_t size);
  * Shuffle the array `ptr` containing `count` objects of size `size`
  */
 extern void pcg_shuffle(
-	pcg_t *restrict rng, void *restrict ptr, size_t count, size_t size);
+	pcg_t *restrict rng, void *restrict ptr, pcg_uint_t count, size_t size);
 
 /*
  * Get an unbiased random number less than the given limit

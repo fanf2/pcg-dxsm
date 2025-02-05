@@ -9,9 +9,6 @@
 #include "pcg32.h"
 #include "pcg64.h"
 
-/* exercise the pcg32_shuffle() large array case */
-#define LARGER (1 << 24)
-
 static void
 test_shuffle64(void) {
 	/* pcg64 has 256 bits of state; 2^256 == 10^77 > 10^68 == 52! */
@@ -37,17 +34,18 @@ test_shuffle64(void) {
 
 static void
 test_shuffle32(pcg32_t *rng) {
+	uint32_t shuffle = 1 << 24;
 	uint32_t *a;
-	a = malloc(LARGER * sizeof(*a));
+	a = malloc(shuffle * sizeof(*a));
 	assert(a != NULL);
 	uint64_t sum = 0;
-	for (uint32_t i = 0; i < LARGER; i++) {
+	for (uint32_t i = 0; i < shuffle; i++) {
 		a[i] = i;
 		sum += i;
 	}
-	pcg32_shuffle(rng, a, LARGER, sizeof(*a));
+	pcg32_shuffle(rng, a, shuffle, sizeof(*a));
 	bool sorted = true;
-	for (uint32_t i = 0; i < LARGER; i++) {
+	for (uint32_t i = 0; i < shuffle; i++) {
 		sum -= a[i];
 		if (a[i] != i)
 			sorted = false;

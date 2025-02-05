@@ -7,7 +7,7 @@
 CFLAGS= -Os -Wall -Wextra
 ARFLAGS= -rcs
 
-OBJ = pcg32.o pcg64.o shuffle.o
+OBJ = pcg32.o pcg64.o
 
 all: test
 	./test
@@ -32,7 +32,6 @@ pcg32.c: pcg32.def pcg.c pcg_blurb.c
 pcg64.c: pcg64.def pcg.c pcg_blurb.c
 pcg32.h: pcg32.def pcg.h pcg_blurb.h pcg32_xsh_rr.c
 pcg64.h: pcg64.def pcg.h pcg_blurb.h pcg64_dxsm.c
-shuffle.o: shuffle.c pcg32.h pcg64.h
 
 .def.c:
 	sed '/^\/\*/d' pcg_blurb.c >$@
