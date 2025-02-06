@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: 0BSD OR MIT-0
 
 .POSIX:
-.PHONY: all test clean dirty format
+.PHONY: all clean dirty format
 .SUFFIXES: .c .h .o .def
 
 CFLAGS= -Os -Wall -Wextra
