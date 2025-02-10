@@ -31,8 +31,7 @@ pcg32.h: pcg32.def pcg.h pcg_blurb.h pcg32_xsh_rr.c
 pcg64.h: pcg64.def pcg.h pcg_blurb.h pcg64_dxsm.c
 
 .def.c:
-	sed '/^\/\*/d' pcg_blurb.c >$@
-	printf '#include "$*.h"\n\n' >>$@
+	sed 's/pcg/$*/g;/^[ /]\*/d' pcg_blurb.c >$@
 	cat $*.def pcg.c |\
 	cc -E - | sed '/^#/d;/^$$/d' | clang-format >>$@
 

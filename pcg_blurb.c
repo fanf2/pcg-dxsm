@@ -7,4 +7,6 @@
 #include <sys/random.h>
 #include <unistd.h>
 
+#include "pcg.h"
+
 /**/
