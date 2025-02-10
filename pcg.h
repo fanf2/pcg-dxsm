@@ -10,22 +10,27 @@ typedef struct pcg {
 extern pcg_t pcg_getentropy(void);
 
 /*
- * Properly initialize a random number generator
- * from raw state and (optional) inc values, e.g.
+ * Initialize a random number generator to a fixed sequence
+ * based on the given state and (optional) inc values, e.g.
  *
- *	pcg_t rng = pcg_seed((pcg_t){ .state = 0xacab1213 });
+ *	pcg_t rng = pcg_seed((pcg_t){ .state = 3141592654 });
  */
 extern pcg_t pcg_seed(pcg_t seed);
 
 /*
- * Get a word of random bits from a random number generator
+ * Get an unbiased random integer, 0 <= ... < limit
  */
-static inline pcg_uint_t pcg_random(pcg_t *rng);
+extern pcg_uint_t pcg_rand(pcg_t *rng, pcg_uint_t limit);
 
 /*
- * Get a random floating point number 0.0 <= ... < 1.0
+ * Get a random floating point number, 0.0 <= ... < 1.0
  */
 static inline pcg_fp_t pcg_fp(pcg_t *rng);
+
+/*
+ * Get a word full of random bits
+ */
+static inline pcg_uint_t pcg_random(pcg_t *rng);
 
 /*
  * Write `size` random bytes at `ptr`
@@ -33,15 +38,10 @@ static inline pcg_fp_t pcg_fp(pcg_t *rng);
 extern void pcg_bytes(pcg_t *restrict rng, void *restrict ptr, size_t size);
 
 /*
- * Shuffle the array `ptr` containing `count` objects of size `size`
+ * Shuffle the array at `ptr` containing `count` objects of size `size`
  */
 extern void pcg_shuffle(
 	pcg_t *restrict rng, void *restrict ptr, pcg_uint_t count, size_t size);
-
-/*
- * Get an unbiased random number less than the given limit
- */
-extern pcg_uint_t pcg_rand(pcg_t *rng, pcg_uint_t limit);
 
 /*
  * The macro pcg_rand_fast(rng, limit) defined in "pcg_blurb.h" is

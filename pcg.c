@@ -57,8 +57,8 @@ pcg_rand(pcg_t *rng, pcg_uint_t limit) {
 }
 
 /*
- * Slow path called from pcg_rand_inline(). Re-check and return `sample`
- * if it passes, or re-try with a new sample.
+ * Slow path called from pcg_rand_inline(). Calculate the exact threshold,
+ * re-check and return `sample` if it passes, or re-try with a new sample.
  *
  *	range = 1 << PCG_UINT_BITS
  *	reject = range % limit
@@ -72,7 +72,7 @@ pcg_rand(pcg_t *rng, pcg_uint_t limit) {
  * makes resampling as rare as possible.) We ensure our results will be
  * unbiased by mapping `quota` of the possible sample values to each of
  * the `limit` possible return values. When the `sample` is over-quota,
- * it is one of the `reject` values that cause a re-try.
+ * it is one of the `reject` possible values that cause a re-try.
  */
 pcg_uint_t
 pcg_rand_slow(pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample) {
@@ -96,7 +96,7 @@ pcg_rand_slow(pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample) {
 	 *
 	 * Lower-half values are spaced `limit` apart by the multiplication.
 	 * Depending on U, `b` (and therefore L) has `quota` or `quota + 1`
-	 * possible values. The alignment `a` is determined by U.
+	 * possible values, and the alignment `a` varies.
 	 *
 	 * We split the `range` covering L into two spans of size `yield`
 	 * and `reject`. The `yield` span is a multiple of `limit` so it

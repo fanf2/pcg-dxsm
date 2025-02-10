@@ -9,18 +9,17 @@
  * is trivially unbiased, so we should completely omit the slow path.
  * But the compiler can't make this optimization because the slow path
  * guard can be true when the `sample` is a large enough power of two.
- * We use Martin Uecker's arcane C tricks to identify the always-fast
- * case at compile time, which requires a macro to test whether `limit`
- * is the right kind of constant expression.
+ * Martin Uecker's arcane C tricks can check at compile time if a macro
+ * argument is a constant expression that passes a test, in our case
+ * whether `limit` is always fast.
  *
  * The expression `limit & limit-1` is zero when the limit is a power
  * of two or zero; when it is cast to `void *` it is either a null
  * pointer constant (always fast) or not (maybe slow).
  *
- * The type of a `?:` expression with a non-void pointer typed branch
- * and a `void *` branch is usually `void *`, unless the `void *` is a
- * null pointer constant, in which case the type of `?:` is the
- * non-void pointer type.
+ * The type of a `?:` expression that has a non-void pointer-typed branch
+ * and a `void *` branch is usually `void *`. But if the `void *` is a
+ * null pointer constant, the type of `?:` is the non-void pointer type.
  *
  * A `_Generic()` expression turns the type of the `?:` into a boolean
  * value indicating whether the limit is always fast or maybe slow.
