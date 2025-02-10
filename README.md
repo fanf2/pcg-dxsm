@@ -4,8 +4,8 @@ Uniform random numbers with PCG
 This repository contains implementations in C of the preferred 32-bit
 and 64-bit variants of [Melissa O'Neill's PCG family of random number
 algorithms][pcg], with Daniel Lemire's nearly-divisionless algorithm
-for unbiased bounded random numbers, and functions for random floating
-point numbers.
+for unbiased bounded random numbers, and functions for random byte
+strings, random floating point numbers, and random shuffles.
 
 [pcg]: https://www.pcg-random.org/
 
@@ -28,14 +28,11 @@ The files `pcg.[ch]` contain code that is generic over the bit size:
   * the RNG state type
   * seeding the RNG
   * Lemire's algorithm
+  * random bytes and shuffles
 
 The files `pcg{32,64}.def` contain macros to configure the generic
 code for 32 bits and 64 bits, respectively. The files `pcg_blurb.[ch]`
 are the prefixes of the generated files.
-
-The file `shuffle.c` contains a Fisher-Yates shuffle using pcg32 and
-Lemire's algorithm. Internally it uses pcg64 to shuffle very large
-arrays.
 
 
 permuted congruential generator
@@ -56,6 +53,11 @@ A bare LCG is a bad RNG. PCG turns an LCG into a good RNG:
 
   * The LCG state is twice the size of the RNG output
   * The LCG state is permuted to produce the RNG output
+
+PCG is cunningly designed to use instruction-level parallelism to
+overlap the LCG state update and the output permutation. Parts of the
+LCG state is used to configure the permutation as well as being inputs
+to the permutation.
 
 [The reference implementation of PCG in C++][pcg-cpp] allows you to
 mix and match LCGs and output permutations at a variety of integer
