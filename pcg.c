@@ -21,7 +21,7 @@ pcg_getentropy(void) {
 void
 pcg_bytes(pcg_t *restrict rng, void *restrict vptr, size_t size) {
 	uint8_t *ptr = vptr;
-	while (size > sizeof(pcg_uint_t)) {
+	while (size >= sizeof(pcg_uint_t)) {
 		pcg_uint_t rand = pcg_random(rng);
 		memcpy(ptr, &rand, sizeof(pcg_uint_t));
 		ptr += sizeof(pcg_uint_t);
