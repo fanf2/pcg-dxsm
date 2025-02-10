@@ -19,3 +19,12 @@
 #define pcg_shuffle      pcg32_shuffle
 #define pcg_seed         pcg32_seed
 #define pcg_getentropy   pcg32_getentropy
+
+#define PCG_BYTES_DECLARE(chunk) \
+	pcg_uint_t chunk[4]
+
+#define PCG_BYTES_RANDOM(chunk, rng)  \
+	chunk[0] = pcg_random(rng); \
+	chunk[1] = pcg_random(rng); \
+	chunk[2] = pcg_random(rng); \
+	chunk[3] = pcg_random(rng)
