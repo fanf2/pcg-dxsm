@@ -5,23 +5,17 @@
 .SUFFIXES: .c .h .o .def
 
 CFLAGS= -Os -Wall -Wextra
-ARFLAGS= -rcs
-
-OBJ = pcg32.o pcg64.o
 
 all: test
 	./test
 
 clean:
-	rm -f pcg32.? pcg64.? pcg6432.a test
+	rm -f pcg32.? pcg64.? test
 
 format:
 	clang-format -i *.[ch]
 
-test: test.c pcg6432.a
-
-pcg6432.a: ${OBJ}
-	${AR} ${ARFLAGS} $@ $^
+test: test.c pcg32.o pcg64.o
 
 pcg32.o: pcg32.c pcg32.h
 pcg64.o: pcg64.c pcg64.h
