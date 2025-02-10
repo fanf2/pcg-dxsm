@@ -5,12 +5,13 @@
 /*
  * Like pcg_rand(rng, limit) but the fast path is inlined.
  *
- * We use Martin Uecker's arcane tricks to identify at compile time if we
- * can completely omit the slow path because the result of the fast path
- * is trivially unbiased, which happens when the limit is a constant power
- * of two or zero. The compiler can't make this optimization because the
- * slow path guard (pcg_uint_t)(sample) < limit can be true when the sample
- * is a large enough power of two.
+ * When the limit is a constant power of two the result of the fast path
+ * is trivially unbiased, so we should completely omit the slow path.
+ * But the compiler can't make this optimization because the slow path
+ * guard can be true when the `sample` is a large enough power of two.
+ * We use Martin Uecker's arcane C tricks to identify the always-fast
+ * case at compile time, which requires a macro to test whether `limit`
+ * is the right kind of constant expression.
  *
  * The expression `limit & limit-1` is zero when the limit is a power
  * of two or zero; when it is cast to `void *` it is either a null
