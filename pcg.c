@@ -21,16 +21,15 @@ pcg_getentropy(void) {
 void
 pcg_bytes(pcg_t *restrict rng, void *restrict ptr, size_t size) {
 	uint8_t *dest = ptr;
-	PCG_BYTES_DECLARE(chunk);
-	while (size >= sizeof(chunk)) {
-		PCG_BYTES_RANDOM(chunk, rng);
-		memcpy(dest, &chunk, sizeof(chunk));
-		dest += sizeof(chunk);
-		size -= sizeof(chunk);
+	while (size >= sizeof(pcg_uint_t)) {
+		pcg_uint_t rand = pcg_random(rng);
+		memcpy(dest, &rand, sizeof(pcg_uint_t));
+		dest += sizeof(pcg_uint_t);
+		size -= sizeof(pcg_uint_t);
 	}
 	if (size > 0) {
-		PCG_BYTES_RANDOM(chunk, rng);
-		memcpy(dest, &chunk, size);
+		pcg_uint_t rand = pcg_random(rng);
+		memcpy(dest, &rand, size);
 	}
 }
 
