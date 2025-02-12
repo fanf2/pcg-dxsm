@@ -4,7 +4,7 @@
 .PHONY: all clean format
 .SUFFIXES: .c .h .o .def
 
-CFLAGS= -Os -Wall -Wextra
+CFLAGS= -O2 -Wall -Wextra -D_DEFAULT_SOURCE
 
 all: test
 	./test
