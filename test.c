@@ -10,7 +10,7 @@
 #include "pcg64.h"
 
 static void
-test_shuffle64(void) {
+test_shuffle64(pcg64_t *rng) {
 	/* pcg64 has 256 bits of state; 2^256 == 10^77 > 10^68 == 52! */
 	size_t suits = 4;
 	size_t ranks = 13;
@@ -22,7 +22,7 @@ test_shuffle64(void) {
 		" A♠︎ 2♠︎ 3♠︎ 4♠︎ 5♠︎ 6♠︎ 7♠︎ 8♠︎ 9♠︎ 0♠︎ J♠︎ Q♠︎ K♠︎";
 	size_t len = sizeof(deck) - 1;
 	size_t size = len / count;
-	pcg64_shuffle((pcg64_t[]){ pcg64_getentropy() }, deck, count, size);
+	pcg64_shuffle(rng, deck, count, size);
 	for (size_t suit = 0; suit < suits; suit++) {
 		char *row = deck + suit * ranks * size;
 		for (size_t rank = 0; rank < ranks; rank++) {
@@ -72,5 +72,5 @@ main(void) {
 	printf("fp %.16f\n", pcg64_double(&rng64));
 
 	test_shuffle32(&rng32);
-	test_shuffle64();
+	test_shuffle64(&rng64);
 }
