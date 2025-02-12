@@ -1,5 +1,9 @@
-pcg6432.a
+*.o
+*.dSYM
 pcg32.[ch]
 pcg64.[ch]
-*.o
+pcg32-*.h
 test
+pcg32-bytes
+pcg32-mul
+pcg32-vec
