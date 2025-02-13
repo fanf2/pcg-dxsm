@@ -11,8 +11,8 @@ all: test
 	./test
 
 clean:
-	rm -f pcg32.[cho] pcg64.[cho] pcg32-*.[ho]
-	rm -f test pcg32-bytes pcg32-mul pcg32-vec
+	rm -f pcg32.[cho] pcg64.[cho]
+	rm -f test bytes bytes-* bytes.[ho]
 
 format:
 	clang-format -i *.[ch]
