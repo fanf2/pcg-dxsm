@@ -232,7 +232,6 @@ pcg32_bytes_xV(pcg32_t *restrict prng, void *restrict ptr, size_t size) {
  */
 
 #include <assert.h>
-#include <math.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -329,7 +328,6 @@ pcg32_bytes_u4(pcg32_t *restrict rng, void *restrict ptr, size_t size) {
 	rng->state = state;
 }
 
-
 #ifdef __APPLE__
 
 /*
@@ -367,87 +365,76 @@ typedef void pcg32_bytes_fn(
 struct {
 	char *name;
 	pcg32_bytes_fn *bytes;
-	double pop, mean, sigma;
+	double speed;
 } measure[] = {
-	{ "u1", pcg32_bytes_u1, 0.0, 0.0, 0.0 },
-	{ "u2", pcg32_bytes_u2, 0.0, 0.0, 0.0 },
-	{ "u3", pcg32_bytes_u3, 0.0, 0.0, 0.0 },
-	{ "u4", pcg32_bytes_u4, 0.0, 0.0, 0.0 },
-	{ "x2", pcg32_bytes_x2, 0.0, 0.0, 0.0 },
-	{ "x4", pcg32_bytes_x4, 0.0, 0.0, 0.0 },
-	{ "x8", pcg32_bytes_x8, 0.0, 0.0, 0.0 },
+	{ "__", pcg32_bytes,    0.0 },
+	{ "u1", pcg32_bytes_u1, 0.0 },
+	{ "u2", pcg32_bytes_u2, 0.0 },
+	{ "u3", pcg32_bytes_u3, 0.0 },
+	{ "u4", pcg32_bytes_u4, 0.0 },
+	{ "x2", pcg32_bytes_x2, 0.0 },
+	{ "x4", pcg32_bytes_x4, 0.0 },
+	{ "x8", pcg32_bytes_x8, 0.0 },
 };
 
 /*
  * needs to be a multiple of 3 so that pcg32_bytes_u3() fills it completely
  */
 #define SIZE 3072
-#define COUNT 69
+
+#define SENSIBLE_TIME (333*1000*1000)
 
 int main(void) {
-	pcg32_t rng0 = pcg32_getentropy();
-	pcg32_t rng = rng0;
-
-	byte *check = malloc(SIZE);
-	assert(check != NULL);
-	pcg32_bytes(&rng, check, SIZE);
-
-	byte *buf = malloc(SIZE);
-	assert(buf != NULL);
-	pcg32_bytes(&rng, buf, SIZE);
-
 	size_t fns = sizeof(measure) / sizeof(measure[0]);
 
-	for (;;) {
-		size_t fn = pcg32_rand(&rng, fns);
-		if(measure[fn].pop == COUNT)
-			continue;
+	pcg32_t rng0 = pcg32_getentropy();
 
+	byte *check = malloc(SIZE);
+	byte *buf = malloc(SIZE);
+
+	assert(check != NULL);
+	assert(buf != NULL);
+
+	pcg32_t rng = rng0;
+
+	uint64_t t0 = nanotime();
+	pcg32_bytes(&rng, buf, SIZE);
+	uint64_t t1 = nanotime();
+
+	uint64_t ns = t1 - t0;
+	size_t iters = SENSIBLE_TIME / ns;
+
+	pcg32_t rngN = rng0;
+
+	for (size_t fn = 0; fn < fns; fn++) {
 		memset(buf, 0, SIZE);
 		rng = rng0;
 
 		__sync_synchronize();
 		uint64_t t0 = nanotime();
 
-		measure[fn].bytes(&rng, buf, SIZE);
+		for (size_t i = 0; i < iters; i++) {
+			measure[fn].bytes(&rng, buf, SIZE);
+		}
 
 		__sync_synchronize();
 		uint64_t t1 = nanotime();
 
-		assert(memcmp(buf, check, SIZE) == 0);
+		if (fn == 0) {
+			memmove(check, buf, SIZE);
+			rngN = rng;
+		} else {
+			assert(memcmp(check, buf, SIZE) == 0);
+			assert(memcmp(&rngN, &rng, sizeof(rng)) == 0);
+		}
 
 		uint64_t ns = t1 - t0;
-		double speed = (double)SIZE / (double)ns;
+		measure[fn].speed = (double)(SIZE * iters) / (double)ns;
 
-		double pop = measure[fn].pop;
-		double mean = measure[fn].mean;
-		double sigma = measure[fn].sigma;
-
-		double delta = speed - mean;
-
-		pop += 1;
-		mean += delta / pop;
-		sigma += delta * (speed - mean);
-
-		measure[fn].pop = pop;
-		measure[fn].mean = mean;
-		measure[fn].sigma = sigma;
-
-		bool done = true;
-		for (size_t fn = 0; fn < fns; fn++) {
-			if (measure[fn].pop < COUNT) {
-				done = false;
-			}
-		}
-		if (done) break;
-	}
-
-	for (size_t fn = 0; fn < fns; fn++) {
-		printf("%s %5.2f +/- %.2f bytes/ns x %.2f\n",
+		printf("%s %5.2f bytes/ns x %.2f\n",
 		       measure[fn].name,
-		       measure[fn].mean,
-		       sqrt(measure[fn].sigma),
-		       measure[fn].mean / measure[0].mean);
+		       measure[fn].speed,
+		       measure[fn].speed / measure[0].speed);
 	}
 }
 
