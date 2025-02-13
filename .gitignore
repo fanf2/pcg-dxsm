@@ -2,8 +2,7 @@
 *.dSYM
 pcg32.[ch]
 pcg64.[ch]
-pcg32-*.h
 test
-pcg32-bytes
-pcg32-mul
-pcg32-vec
+bytes
+bytes-*
+bytes.h

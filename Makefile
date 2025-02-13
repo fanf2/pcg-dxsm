@@ -17,7 +17,11 @@ clean:
 format:
 	clang-format -i *.[ch]
 
-test: test.c pcg32.o pcg64.o
+test:    test.o pcg32.o pcg64.o
+test.o:  test.c pcg32.h pcg64.h
+
+bytes:   bytes.o pcg32.o
+bytes.o: bytes.c bytes.h pcg32.h
 
 pcg32.o: pcg32.c pcg32.h
 pcg64.o: pcg64.c pcg64.h
@@ -36,15 +40,10 @@ pcg64.h: pcg64.def pcg.h pcg_blurb.h pcg64_dxsm.c
 	cat $*.def pcg.h $*_*.c |\
 	${CC} -E - | sed '/^#/d;/^$$/d' | clang-format >>$@
 
-# hyphens avoid the $*_*.c glob above
+bytes.h: bytes-gen
+	./bytes-gen
+	${CC} -E bytes-vec.h | sed '/^#/d;/^$$/d' | clang-format |\
+	cat bytes-mul.h - >bytes.h
 
-pcg32-bytes: pcg32-bytes.o pcg32.o
-pcg32-bytes.o: pcg32-bytes.c pcg32-mul.h pcg32-vec.h pcg32.h
-
-pcg32-mul: pcg32-mul.c
-pcg32-mul.h: pcg32-mul
-	./pcg32-mul >pcg32-mul.h
-
-pcg32-vec: pcg32-vec.c
-pcg32-vec.h: pcg32-vec
-	./pcg32-vec | cc -E - | sed '/^#/d;/^$$/d' >$@
+bytes-gen: bytes.c
+	${CC} ${CFLAGS} -DGENERATE -o bytes-gen bytes.c
