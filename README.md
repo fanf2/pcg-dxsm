@@ -132,6 +132,16 @@ functions that generate random numbers in 0.0 <= ... < 1.0 using
 [rand-float]: https://dotat.at/@/2023-06-23-random-double.html
 
 
+vectorized pcg32
+----------------
+
+Run `make bytes` to build a benchmark that tests various sizes of
+unrolled and vectorized pcg32. This demonstrates SIMD optimization of
+a single instance of pcg32. Vectorized pcg32 produces the same
+sequence of random numbers generated in the same order as normal
+scalar pcg32, but much faster.
+
+
 license
 -------
 
