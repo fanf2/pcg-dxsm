@@ -1,5 +1,5 @@
-Uniform random numbers with PCG
-===============================
+Random numbers with PCG
+=======================
 
 This repository contains implementations in C of the preferred 32-bit
 and 64-bit variants of [Melissa O'Neill's PCG family of random number
@@ -43,11 +43,11 @@ congruential generators and a collection of output permutations.
 
 A linear congruential random number generator looks like:
 
-		state = state * mul + inc;
+        state = state * mul + inc;
 
 The multiplier `mul` is usually fixed; the increment `inc` can be
-fixed, but PCG implementations usually allow it to be chosen when the
-RNG is seeded.
+fixed, but PCG implementations usually allow it to be configured
+when the RNG is seeded.
 
 A bare LCG is a bad RNG. PCG turns an LCG into a good RNG:
 
@@ -55,9 +55,9 @@ A bare LCG is a bad RNG. PCG turns an LCG into a good RNG:
   * The LCG state is permuted to produce the RNG output
 
 PCG is cunningly designed to use instruction-level parallelism to
-overlap the LCG state update and the output permutation. Parts of the
-LCG state is used to configure the permutation as well as being inputs
-to the permutation.
+overlap the LCG state update and the output permutation. Different
+bitfields of the LCG state are used as the target of the permutation
+and to control the permutation.
 
 [The reference implementation of PCG in C++][pcg-cpp] allows you to
 mix and match LCGs and output permutations at a variety of integer
