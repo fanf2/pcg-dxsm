@@ -91,6 +91,12 @@
 
 #if defined(GENERATE)
 
+/*
+ * This program is compiled twice: the first section here does some
+ * code generation before the actual benchmark is compiled from the
+ * section below.
+ */
+
 #include <err.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -121,8 +127,8 @@ generate_mul_h(void) {
 		err(1, "open bytes-mul.h");
 	}
 
-	lcg64_mul(fp_mul, 8, "MULs", 1, 0);
-	lcg64_mul(fp_mul, 8, "MULi", 0, 1);
+	lcg64_mul(fp_mul, 16, "MULs", 1, 0);
+	lcg64_mul(fp_mul, 16, "MULi", 0, 1);
 
 	if (fclose(fp_mul) < 0) {
 		err(1, "write bytes-mul.h");
@@ -171,6 +177,7 @@ generate_vec_h(void) {
 	expand(fp_vec, 2);
 	expand(fp_vec, 4);
 	expand(fp_vec, 8);
+	expand(fp_vec, 16);
 
 	if (fclose(fp_vec) < 0) {
 		err(1, "write bytes-vec.h");
@@ -178,8 +185,8 @@ generate_vec_h(void) {
 }
 
 /*
- * this first main() does compile-time codegen;
- * there's a second main() below which runs the benchmarks
+ * This first main() drives the compile-time code generation;
+ * there's a second main() below which runs the benchmarks.
  */
 
 int main(void) {
@@ -248,6 +255,10 @@ typedef unsigned char byte;
 	type __attribute__((vector_size(sizeof(type) * size)))
 
 #include "pcg32.h"
+
+/*
+ * bytes.h is combined from bytes-mul.h and bytes-vec.h by the Makefile
+ */
 #include "bytes.h"
 
 static inline void
@@ -367,7 +378,7 @@ struct {
 	pcg32_bytes_fn *bytes;
 	double speed;
 } measure[] = {
-	{ "__", pcg32_bytes,    0.0 },
+	{ "__", pcg32_bytes, 0.0 },
 	{ "u1", pcg32_bytes_u1, 0.0 },
 	{ "u2", pcg32_bytes_u2, 0.0 },
 	{ "u3", pcg32_bytes_u3, 0.0 },
@@ -375,6 +386,7 @@ struct {
 	{ "x2", pcg32_bytes_x2, 0.0 },
 	{ "x4", pcg32_bytes_x4, 0.0 },
 	{ "x8", pcg32_bytes_x8, 0.0 },
+	{ "16", pcg32_bytes_x16, 0.0 },
 };
 
 /*
