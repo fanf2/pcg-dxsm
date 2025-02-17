@@ -37,13 +37,12 @@ void
 pcg_shuffle(
 	pcg_t *restrict rng, void *restrict ptr, pcg_uint_t count, size_t size
 ) {
-	uint8_t mid_x, top_x, *base = ptr;
+	uint8_t swap_x, *base = ptr;
 	while (count > 1) {
 		uint8_t *mid = base + size * pcg_rand_fast(rng, count);
 		uint8_t *top = base + size * --count;
 		for (size_t x = 0; x < size; x++) {
-			mid_x = mid[x], top_x = top[x];
-			mid[x] = top_x, top[x] = mid_x;
+			swap_x = mid[x]; mid[x] = top[x]; top[x] = swap_x;
 		}
 	}
 }
