@@ -96,7 +96,7 @@ pcg_rand_slow(pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample) {
 	 *
 	 * Lower-half values are spaced `limit` apart by the multiplication.
 	 * Depending on U, `b` (and therefore L) has `quota` or `quota + 1`
-	 * possible values, and the alignment `a` varies.
+	 * possible values, and the alignment varies, `0 <= a < limit`.
 	 *
 	 * We split the `range` covering L into two spans of size `yield`
 	 * and `reject`. The `yield` span is a multiple of `limit` so it

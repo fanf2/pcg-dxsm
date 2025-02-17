@@ -55,8 +55,8 @@ pcg_rand_inline(pcg_t *rng, pcg_uint_t limit, int maybe_slow) {
 		pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample);
 	/*
 	 * Get a value W = PCG_UINT_BITS wide from pcg_random(). We can think
-	 * of it as a 0.W bit fixed-point value less than 1.0. When we do a
-	 * double-width multiply by the limit, we get a W.W bit fixed-point
+	 * of it as a 0,W bit fixed-point value less than 1.0. When we do a
+	 * double-width multiply by the limit, we get a W,W bit fixed-point
 	 * value less than the limit. Our result will be the integer part
 	 * (upper W bits), and we will use the fraction part (lower W bits)
 	 * to determine whether or not we need to resample.
