@@ -12,11 +12,13 @@
 
 #define pcg_bytes        pcg64_bytes
 #define pcg_fp           pcg64_double
-#define pcg_rand         pcg64_rand
+#define pcg_rand_const   pcg64_rand_const
 #define pcg_rand_fast    pcg64_rand_fast
 #define pcg_rand_slow    pcg64_rand_slow
-#define pcg_rand_inline  pcg64_rand_inline
-#define pcg_random       pcg64_random
+#define pcg_rand_small   pcg64_rand_small
+#define pcg_ulong_biased pcg64_ulong_biased
+#define pcg_random_fast  pcg64_random_fast
+#define pcg_random_small pcg64_random_small
 #define pcg_shuffle      pcg64_shuffle
 #define pcg_seed         pcg64_seed
 #define pcg_getentropy   pcg64_getentropy

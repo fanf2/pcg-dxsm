@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: 0BSD OR MIT-0
 
+/*
+ * pcg64 dxsm by Melissa O'Neill
+ */
+
 static inline uint64_t
-pcg64_random(pcg64_t *rng) {
+pcg64_random_fast(pcg64_t *rng) {
 	/* cheap (half-width) multiplier */
 	const uint64_t mul = 15750249268501108917ULL;
 	/* linear congruential generator */

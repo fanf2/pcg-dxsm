@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: 0BSD OR MIT-0
 
+/*
+ * pcg32 by Melissa O'Neill
+ */
+
 static inline uint32_t
-pcg32_random(pcg32_t *rng) {
+pcg32_random_fast(pcg32_t *rng) {
 	/* linear congruential generator */
 	uint64_t state = rng->state;
 	rng->state = state * 6364136223846793005ULL + rng->inc;

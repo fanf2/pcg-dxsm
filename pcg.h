@@ -18,19 +18,25 @@ extern pcg_t pcg_getentropy(void);
 extern pcg_t pcg_seed(pcg_t seed);
 
 /*
- * Get an unbiased random integer, 0 <= ... < limit
+ * Get a word full of random bits
+ *
+ * The pcg_random() macro automatically selects a suitable alternative
  */
-extern pcg_uint_t pcg_rand(pcg_t *rng, pcg_uint_t limit);
+static inline pcg_uint_t pcg_random_fast(pcg_t *rng);
+extern pcg_uint_t pcg_random_small(pcg_t *rng);
+
+/*
+ * Get an unbiased random integer, 0 <= ... < limit
+ *
+ * The pcg_rand() macro automatically selects a suitable alternative
+ */
+static inline pcg_uint_t pcg_rand_fast(pcg_t *rng, pcg_uint_t limit);
+extern pcg_uint_t pcg_rand_small(pcg_t *rng, pcg_uint_t limit);
 
 /*
  * Get a random floating point number, 0.0 <= ... < 1.0
  */
 static inline pcg_fp_t pcg_fp(pcg_t *rng);
-
-/*
- * Get a word full of random bits
- */
-static inline pcg_uint_t pcg_random(pcg_t *rng);
 
 /*
  * Write `size` random bytes at `ptr`
@@ -44,32 +50,94 @@ extern void pcg_shuffle(
 	pcg_t *restrict rng, void *restrict ptr, pcg_uint_t count, size_t size);
 
 /*
- * The macro pcg_rand_fast(rng, limit) defined in "pcg_blurb.h" is
- * like pcg_rand(rng, limit) but the fast path is inlined.
+ * Internal helper to get a biased random number logically less than the
+ * limit. Treat a value from pcg_random() (which is W = PCG_UINT_BITS
+ * wide) as a 0,W bit fixed point value less than 1.0. A double width
+ * multiply by the limit gives us a W,W bit fixed point value less than
+ * the limit. The caller will extract the result from the integer part
+ * (upper W bits), and use the fraction part (lower W bits) to determine
+ * if it needs to resample, as explained below.
+ */
+static inline pcg_ulong_t
+pcg_ulong_biased(pcg_t *rng, pcg_uint_t limit) {
+	return((pcg_ulong_t)pcg_random_fast(rng) * (pcg_ulong_t)limit);
+}
+
+/*
+ * Get an unbiased random number less than the limit, where the limit is
+ * a constant greater than zero. We use Daniel Lemire's rejection sampling
+ * algorithm, tuned for calculating the reject threshold at compile time.
  *
- * Don't call pcg_rand_inline() directly, call pcg_rand_fast().
+ *	range = 1 << PCG_UINT_BITS
+ *	reject = range % limit
+ *	yield = range - reject
+ *	quota = yield / limit
+ *
+ * The number of possible `sample` values is the same as the `range` of
+ * possible values returned by pcg_random(). We will return a result if
+ * the `sample` is one of `yield` possible values, where `yield` is the
+ * largest multiple of `limit` less than `range`. (The largest multiple
+ * makes resampling as rare as possible.) We ensure our results will be
+ * unbiased by mapping `quota` of the possible sample values to each of
+ * the `limit` possible return values. When the `sample` is over-quota,
+ * it is one of the `reject` possible values that cause a re-try.
  */
 static inline pcg_uint_t
-pcg_rand_inline(pcg_t *rng, pcg_uint_t limit, int maybe_slow) {
+pcg_rand_const(pcg_t *rng, pcg_uint_t limit) {
+	/*
+	 * The value of `range` doesn't fit into a `pcg_uint_t`, so we use
+	 * a trick to calculate `reject` without overflow:
+	 *
+	 * reject =                range % limit
+	 *       ==      (range - limit) % limit // equiv modulo limit
+	 *       == (pcg_uint_t)(-limit) % limit // equiv modulo range
+	 *
+	 * This % is safe because of the guard in the pcg_rand() macro.
+	 */
+	pcg_uint_t reject = -limit % limit;
+	/*
+	 * The upper half of `sample` has `limit` possible values; for each
+	 * upper-half value U, the lower half has a value of the form
+	 *
+	 *	L = a + b * limit
+	 *
+	 * Lower-half values are spaced `limit` apart by the multiplication.
+	 * Depending on U, `b` (and therefore L) has `quota` or `quota + 1`
+	 * possible values, and the alignment varies, `0 <= a < limit`.
+	 *
+	 * We split the `range` covering L into two spans of size `yield`
+	 * and `reject`. The `yield` span is a multiple of `limit` so it
+	 * always covers exactly `quota` possible values of L, regardless
+	 * of the alignment; we return these unbiased samples. For some
+	 * values of U, one over-quota value of L can also fall in the
+	 * `reject` span; when we get one of these samples we re-try.
+	 */
+	pcg_ulong_t sample;
+	do sample = pcg_ulong_biased(rng, limit);
+	while ((pcg_uint_t)(sample) < reject);
+	return ((pcg_uint_t)(sample >> PCG_UINT_BITS));
+}
+
+/*
+ * Get an unbiased random number less than the limit, where the limit is
+ * unknown until run time. Daniel Lemire's nearly-divisionless algorithm
+ * has the same rejection sampling loop as above, but avoids calculating
+ * the reject threshold in most cases. The fast path is inlined; the
+ * rarely used rejection loop is in an extern function to save space.
+ */
+static inline pcg_uint_t
+pcg_rand_fast(pcg_t *rng, pcg_uint_t limit) {
 	extern pcg_uint_t pcg_rand_slow(
 		pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample);
 	/*
-	 * Get a value W = PCG_UINT_BITS wide from pcg_random(). We can think
-	 * of it as a 0,W bit fixed-point value less than 1.0. When we do a
-	 * double-width multiply by the limit, we get a W,W bit fixed-point
-	 * value less than the limit. Our result will be the integer part
-	 * (upper W bits), and we will use the fraction part (lower W bits)
-	 * to determine whether or not we need to resample.
+	 * Get a sample and quickly check if it is unbiased using `limit`
+	 * as a safe over-estimate for the reject threshold (`limit` is
+	 * greater than `anything % limit`). The slow path will calculate
+	 * the exact threshold as above, re-check and return this sample
+	 * if it passes, or re-try with another sample.
 	 */
-	pcg_ulong_t sample = (pcg_ulong_t)pcg_random(rng) * (pcg_ulong_t)limit;
-	/*
-	 * Return this sample if it is definitely unbiased. The compile-time
-	 * value maybe_slow is false when the sample cannot be biased, else use
-	 * `limit` as a fast over-estimate for the reject threshold. In the
-	 * slow path we calculate the exact threshold with `% limit`, re-check
-	 * and return this sample if it passes, or re-try with another sample.
-	 */
-	if (maybe_slow && (pcg_uint_t)(sample) < limit)
+	pcg_ulong_t sample = pcg_ulong_biased(rng, limit);
+	if ((pcg_uint_t)(sample) < limit)
 		return (pcg_rand_slow(rng, limit, sample));
 	return ((pcg_uint_t)(sample >> PCG_UINT_BITS));
 }

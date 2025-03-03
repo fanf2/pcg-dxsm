@@ -57,20 +57,20 @@ test_shuffle32(pcg32_t *rng) {
 
 int
 main(void) {
-	pcg32_t rng32 = pcg32_getentropy();
-	assert(pcg32_rand(&rng32, 0) == 0);
-	printf("mask %" PRIX32 "\n", pcg32_rand_fast(&rng32, 1UL << 20));
-	printf("fast %" PRIX32 "\n", pcg32_rand_fast(&rng32, INT32_MAX));
-	printf("slow %" PRIX32 "\n", pcg32_rand(&rng32, INT32_MAX));
-	printf("fp %.8f\n", pcg32_float(&rng32));
+	pcg32_t rng32[] = { pcg32_getentropy() };
+	assert(pcg32_rand(rng32, 0) == 0);
+	printf("mask %" PRIX32 "\n", pcg32_rand_fast(rng32, 1UL << 20));
+	printf("fast %" PRIX32 "\n", pcg32_rand_fast(rng32, INT32_MAX));
+	printf("slow %" PRIX32 "\n", pcg32_rand(rng32, INT32_MAX));
+	printf("fp %.8f\n", pcg32_float(rng32));
 
-	pcg64_t rng64 = pcg64_getentropy();
-	assert(pcg64_rand(&rng64, 0) == 0);
-	printf("mask %" PRIX64 "\n", pcg64_rand_fast(&rng64, 1ULL << 40));
-	printf("fast %" PRIX64 "\n", pcg64_rand_fast(&rng64, INT64_MAX));
-	printf("slow %" PRIX64 "\n", pcg64_rand(&rng64, INT64_MAX));
-	printf("fp %.16f\n", pcg64_double(&rng64));
+	pcg64_t rng64[] = { pcg64_getentropy() };
+	assert(pcg64_rand(rng64, 0) == 0);
+	printf("mask %" PRIX64 "\n", pcg64_rand_fast(rng64, 1ULL << 40));
+	printf("fast %" PRIX64 "\n", pcg64_rand_fast(rng64, INT64_MAX));
+	printf("slow %" PRIX64 "\n", pcg64_rand(rng64, INT64_MAX));
+	printf("fp %.16f\n", pcg64_double(rng64));
 
-	test_shuffle32(&rng32);
-	test_shuffle64(&rng64);
+	test_shuffle32(rng32);
+	test_shuffle64(rng64);
 }

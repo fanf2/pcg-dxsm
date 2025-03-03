@@ -11,11 +11,13 @@
 
 #define pcg_fp           pcg32_float
 #define pcg_bytes        pcg32_bytes
-#define pcg_rand         pcg32_rand
+#define pcg_rand_const   pcg32_rand_const
 #define pcg_rand_fast    pcg32_rand_fast
 #define pcg_rand_slow    pcg32_rand_slow
-#define pcg_rand_inline  pcg32_rand_inline
-#define pcg_random       pcg32_random
+#define pcg_rand_small   pcg32_rand_small
+#define pcg_ulong_biased pcg32_ulong_biased
+#define pcg_random_fast  pcg32_random_fast
+#define pcg_random_small pcg32_random_small
 #define pcg_shuffle      pcg32_shuffle
 #define pcg_seed         pcg32_seed
 #define pcg_getentropy   pcg32_getentropy

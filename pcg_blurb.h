@@ -2,31 +2,27 @@
 
 #pragma once
 
+#if __NO_INLINE__ || __OPTIMIZE_SIZE__
+#define pcg_random pcg_random_small
+#define pcg_rand   pcg_rand_small
+#else
+#define pcg_random pcg_random_fast
+
 /*
- * Like pcg_rand(rng, limit) but the fast path is inlined.
- *
- * When the limit is a constant power of two the result of the fast path
- * is trivially unbiased, so we should completely omit the slow path.
- * But the compiler can't make this optimization because the slow path
- * guard can be true when the `sample` is a large enough power of two.
- * Martin Uecker's arcane C tricks can check at compile time if a macro
- * argument is a constant expression that passes a test, in our case
- * whether `limit` is always fast.
- *
- * The expression `limit & limit-1` is zero when the limit is a power
- * of two or zero; when it is cast to `void *` it is either a null
- * pointer constant (always fast) or not (maybe slow).
- *
- * The type of a `?:` expression that has a non-void pointer-typed branch
- * and a `void *` branch is usually `void *`. But if the `void *` is a
- * null pointer constant, the type of `?:` is the non-void pointer type.
- *
- * A `_Generic()` expression turns the type of the `?:` into a boolean
- * value indicating whether the limit is always fast or maybe slow.
+ * Select an inline version of pcg_rand() specialized for a run-time
+ * variable or a compile-time constant limit, using Martin Uecker's
+ * arcane C tricks. The type of a `?:` expression that has a non-void
+ * pointer-typed branch and a `void *` branch is usually `void *`. But
+ * if the `void *` is a null pointer constant, the type of `?:` is the
+ * non-void pointer type. We use `!limit` so that only `limit != 0`
+ * becomes a null pointer constant, so that we only pass a nonzero
+ * constant limit to a function that immediately calculates % limit.
  */
-#define pcg_rand_fast(rng, limit)				   \
-	pcg_rand_inline(rng, limit,				    \
-		_Generic(0 ? (void *)(long)((limit) & ((limit) - 1)) \
-			   : (long *) 0, long *: 0, void *: 1))
+#define pcg_rand(rng, limit)					\
+	_Generic(0L ? (long *) 0L : (void *)(long)!(limit),	\
+		long *: pcg_rand_const(rng, limit),		\
+		void *: pcg_rand_fast(rng, limit))
+
+#endif
 
 /**/
