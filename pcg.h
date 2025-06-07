@@ -32,6 +32,11 @@ extern pcg_uint_t pcg_random_small(pcg_t *rng);
  */
 static inline pcg_uint_t pcg_rand_fast(pcg_t *rng, pcg_uint_t limit);
 extern pcg_uint_t pcg_rand_small(pcg_t *rng, pcg_uint_t limit);
+/*
+ * Internal helper out-of-line slow path for pcg_rand_fast()
+ */
+extern pcg_uint_t pcg_rand_slow(
+	pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample);
 
 /*
  * Get a random floating point number, 0.0 <= ... < 1.0
@@ -127,8 +132,6 @@ pcg_rand_const(pcg_t *rng, pcg_uint_t limit) {
  */
 static inline pcg_uint_t
 pcg_rand_fast(pcg_t *rng, pcg_uint_t limit) {
-	extern pcg_uint_t pcg_rand_slow(
-		pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample);
 	/*
 	 * Get a sample and quickly check if it is unbiased using `limit`
 	 * as a safe over-estimate for the reject threshold (`limit` is
