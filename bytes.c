@@ -373,7 +373,7 @@ nanotime(void) {
 typedef void pcg32_bytes_fn(
 	pcg32_t *restrict rng, void *restrict ptr, size_t size);
 
-struct {
+static struct {
 	char *name;
 	pcg32_bytes_fn *bytes;
 	double speed;
