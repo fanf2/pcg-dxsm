@@ -2,7 +2,7 @@
 
 #pragma once
 
-#if __NO_INLINE__ || __OPTIMIZE_SIZE__
+#if defined(__NO_INLINE__) || defined(__OPTIMIZE_SIZE__)
 #define pcg_random pcg_random_small
 #define pcg_rand   pcg_rand_small
 #else
