@@ -98,6 +98,20 @@ pcg64_double53(pcg64_t *rng64) {
 
 #include "nanotime.h"
 
+#ifdef __arm64__
+#include <arm_acle.h>
+#define fence() __isb(15)
+#endif
+
+#ifdef __amd64__
+#include <immintrin.h>
+#define fence() _mm_mfence()
+#endif
+
+#ifndef fence
+#define fence()
+#endif
+
 static double
 check(uint64_t count) {
 	uint64_t sum = 0;
@@ -121,6 +135,7 @@ static void time_seq23(void) {
 
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
+		fence();
 		sum += float23(u << (32 - shift));
 	}
 
@@ -139,6 +154,7 @@ static void time_seq24(void) {
 
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
+		fence();
 		sum += float24(u << (32 - shift));
 	}
 
@@ -158,6 +174,7 @@ static void time_seq52(void) {
 
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
+		fence();
 		sum += double52(u << (64 - shift));
 	}
 
@@ -176,6 +193,7 @@ static void time_seq53(void) {
 
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
+		fence();
 		sum += double53(u << (64 - shift));
 	}
 
@@ -194,6 +212,7 @@ static void time_rand23(void) {
 
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
+		fence();
 		sum += pcg32_float23(rng32);
 	}
 
@@ -211,6 +230,7 @@ static void time_rand24(void) {
 
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
+		fence();
 		sum += pcg32_float24(rng32);
 	}
 
@@ -228,6 +248,7 @@ static void time_rand52(void) {
 
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
+		fence();
 		sum += pcg64_double52(rng64);
 	}
 
@@ -245,6 +266,7 @@ static void time_rand53(void) {
 
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
+		fence();
 		sum += pcg64_double53(rng64);
 	}
 
