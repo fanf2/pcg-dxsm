@@ -128,7 +128,7 @@ static void time_seq23(void) {
 
 	printf("23 total %f\n", (double)(sum));
 	printf("23 check %f\n", check(count));
-	printf("22 speed %f\n", speed(count, t0, t1));
+	printf("23 speed %f\n", speed(count, t0, t1));
 }
 
 static void time_seq24(void) {
@@ -183,7 +183,7 @@ static void time_seq53(void) {
 
 	printf("53 total %f\n", (double)(sum));
 	printf("53 check %f\n", check(count));
-	printf("52 speed %f\n", speed(count, t0, t1));
+	printf("53 speed %f\n", speed(count, t0, t1));
 }
 
 static void time_rand23(void) {
@@ -200,7 +200,7 @@ static void time_rand23(void) {
 	uint64_t t1 = nanotime();
 
 	printf("23 total %f\n", (double)(sum));
-	printf("22 speed %f\n", speed(count, t0, t1));
+	printf("23 speed %f\n", speed(count, t0, t1));
 }
 
 static void time_rand24(void) {
@@ -251,7 +251,7 @@ static void time_rand53(void) {
 	uint64_t t1 = nanotime();
 
 	printf("53 total %f\n", (double)(sum));
-	printf("52 speed %f\n", speed(count, t0, t1));
+	printf("53 speed %f\n", speed(count, t0, t1));
 }
 
 int main(void) {
