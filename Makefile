@@ -24,8 +24,8 @@ test.o:  test.c pcg32.h pcg64.h
 bytes:   bytes.o pcg32.o
 bytes.o: bytes.c bytes.h nanotime.h pcg32.h
 
-floats: floats.o fcvt.o pcg32.o
-floats.o: floats.c nanotime.h pcg32.h
+floats: floats.o fcvt.o pcg32.o pcg64.o
+floats.o: floats.c nanotime.h pcg32.h pcg64.h
 
 pcg32.o: pcg32.c pcg32.h
 pcg64.o: pcg64.c pcg64.h
@@ -52,5 +52,5 @@ bytes.h: bytes-gen
 bytes-gen: bytes.c
 	${CC} ${CFLAGS} -DGENERATE -o bytes-gen bytes.c
 
-fcvt.o: floats.c
+fcvt.o: floats.c pcg32.h pcg64.h
 	${CC} ${CFLAGS} -DSEPARATE -c -o fcvt.o floats.c
