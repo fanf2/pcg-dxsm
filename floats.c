@@ -15,8 +15,9 @@
  *
  * Which is faster?
  *
- * On my Apple M1 Pro, the bitcasting and multiplying take the same
- * time, and single and double precision are the same speed.
+ * On my Apple M1 Pro and on my AMD Ryzen 7950X, the two kinds of
+ * conversion take the same time, and single and double precision
+ * are also the same speed.
  */
 
 #include <assert.h>
