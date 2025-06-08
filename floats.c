@@ -262,15 +262,15 @@ int main(void) {
 	}
 	printf("warmup %x\n", rand);
 
+	time_seq23();
+	time_seq24();
 	time_seq52();
 	time_seq53();
-	time_seq24();
-	time_seq23();
 
+	time_rand23();
+	time_rand24();
 	time_rand52();
 	time_rand53();
-	time_rand24();
-	time_rand23();
 }
 
 #endif
