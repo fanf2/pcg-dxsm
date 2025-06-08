@@ -244,7 +244,8 @@ pcg32_bytes_xV(pcg32_t *restrict prng, void *restrict ptr, size_t size) {
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
+
+#include "nanotime.h"
 
 typedef unsigned char byte;
 
@@ -339,37 +340,6 @@ pcg32_bytes_u4(pcg32_t *restrict rng, void *restrict ptr, size_t size) {
 	rng->state = state;
 }
 
-#ifdef __APPLE__
-
-/*
- * need a nonstandard API to get nanosecond resolution, sigh
- */
-
-#include <mach/mach_time.h>
-
-static uint64_t
-nanotime(void) {
-	static mach_timebase_info_data_t scale;
-	if (scale.denom == 0) {
-		kern_return_t status = mach_timebase_info(&scale);
-		assert(status == KERN_SUCCESS);
-	}
-	return (mach_absolute_time() * scale.numer / scale.denom);
-}
-
-#else
-
-#define NS_PER_S (1000*1000*1000)
-
-static uint64_t
-nanotime(void) {
-	struct timespec tv;
-	assert(clock_gettime(CLOCK_MONOTONIC, &tv) == 0);
-	return((uint64_t)tv.tv_sec * NS_PER_S + (uint64_t)tv.tv_nsec);
-}
-
-#endif
-
 typedef void pcg32_bytes_fn(
 	pcg32_t *restrict rng, void *restrict ptr, size_t size);
 
@@ -422,14 +392,12 @@ int main(void) {
 		memset(buf, 0, SIZE);
 		rng = rng0;
 
-		__sync_synchronize();
 		uint64_t t0 = nanotime();
 
 		for (size_t i = 0; i < iters; i++) {
 			measure[fn].bytes(&rng, buf, SIZE);
 		}
 
-		__sync_synchronize();
 		uint64_t t1 = nanotime();
 
 		if (fn == 0) {

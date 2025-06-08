@@ -21,7 +21,7 @@ test:    test.o pcg32.o pcg64.o
 test.o:  test.c pcg32.h pcg64.h
 
 bytes:   bytes.o pcg32.o
-bytes.o: bytes.c bytes.h pcg32.h
+bytes.o: bytes.c bytes.h nanotime.h pcg32.h
 
 pcg32.o: pcg32.c pcg32.h
 pcg64.o: pcg64.c pcg64.h
