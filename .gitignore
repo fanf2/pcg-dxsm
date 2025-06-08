@@ -6,3 +6,6 @@ test
 bytes
 bytes-*
 bytes.h
+floats
+floats.o
+fcvt.o
