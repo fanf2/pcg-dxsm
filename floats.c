@@ -27,29 +27,15 @@
 #include "pcg32.h"
 #include "pcg64.h"
 
-#ifdef __arm64__
-#include <arm_acle.h>
-#define fence() __isb(15)
-#endif
-
-#ifdef __amd64__
-#include <immintrin.h>
-#define fence() _mm_mfence()
-#endif
-
-#ifndef fence
-#define fence()
-#endif
-
-extern void baseline(float *ret, uint32_t *u);
-extern void float23(float *ret, uint32_t *u);
-extern void float24(float *ret, uint32_t *u);
-extern void double52(double *ret, uint64_t *u);
-extern void double53(double *ret, uint64_t *u);
-extern void pcg32_float23(float *ret, pcg32_t *rng32);
-extern void pcg32_float24(float *ret, pcg32_t *rng32);
-extern void pcg64_double52(double *ret, pcg64_t *rng64);
-extern void pcg64_double53(double *ret, pcg64_t *rng64);
+extern double baseline(uint32_t u);
+extern float float23(uint32_t u);
+extern float float24(uint32_t u);
+extern double double52(uint64_t u);
+extern double double53(uint64_t u);
+extern float pcg32_float23(pcg32_t *rng32);
+extern float pcg32_float24(pcg32_t *rng32);
+extern double pcg64_double52(pcg64_t *rng64);
+extern double pcg64_double53(pcg64_t *rng64);
 
 #ifdef CONVERSIONS
 
@@ -59,79 +45,57 @@ extern void pcg64_double53(double *ret, pcg64_t *rng64);
 		__typeof__(v) _v; t _t;			\
 	}){ ._v = (v) })._t)
 
-void
-baseline(float *ret, uint32_t *pu) {
-	fence();
-	*ret = bitcast(float, *pu);
-	fence();
+double
+baseline(uint32_t u) {
+	return((void)(u), 0.0);
 }
 
-void
-float23(float *ret, uint32_t *pu) {
-	fence();
-	uint32_t u = *pu;
+float
+float23(uint32_t u) {
 	u = ((uint32_t)(127) << 23) | (u >> 9);
-        *ret = bitcast(float, u) - 1.0f;
-	fence();
+        return(bitcast(float, u) - 1.0f);
 }
 
-void
-float24(float *ret, uint32_t *pu) {
-	fence();
-	uint32_t u = *pu;
-	*ret = (float)(u >> 8) * 0x1.0p-24f;
-	fence();
+float
+float24(uint32_t u) {
+	return ((float)(u >> 8) * 0x1.0p-24f);
 }
 
-void
-double52(double *ret, uint64_t *pu) {
-	fence();
-	uint64_t u = *pu;
+double
+double52(uint64_t u) {
 	u = ((uint64_t)(1023) << 52) | (u >> 12);
-        *ret = bitcast(double, u) - 1.0;
-	fence();
+        return(bitcast(double, u) - 1.0);
 }
 
-void
-double53(double *ret, uint64_t *pu) {
-	fence();
-	uint64_t u = *pu;
-	*ret = (double)(u >> 11) * 0x1.0p-53;
-	fence();
+double
+double53(uint64_t u) {
+	return ((double)(u >> 11) * 0x1.0p-53);
 }
 
-void
-pcg32_float23(float *ret, pcg32_t *rng32) {
-	fence();
+float
+pcg32_float23(pcg32_t *rng32) {
 	uint32_t u = pcg32_random_fast(rng32);
 	u = ((uint32_t)(127) << 23) | (u >> 9);
-        *ret = bitcast(float, u) - 1.0f;
-	fence();
+        return(bitcast(float, u) - 1.0f);
 }
 
-void
-pcg32_float24(float *ret, pcg32_t *rng32) {
-	fence();
+float
+pcg32_float24(pcg32_t *rng32) {
 	uint32_t u = pcg32_random_fast(rng32);
-	*ret = (float)(u >> 8) * 0x1.0p-24f;
-	fence();
+	return ((float)(u >> 8) * 0x1.0p-24f);
 }
 
-void
-pcg64_double52(double *ret, pcg64_t *rng64) {
-	fence();
+double
+pcg64_double52(pcg64_t *rng64) {
 	uint64_t u = pcg64_random_fast(rng64);
 	u = ((uint64_t)(1023) << 52) | (u >> 12);
-        *ret = bitcast(double, u) - 1.0;
-	fence();
+        return(bitcast(double, u) - 1.0);
 }
 
-void
-pcg64_double53(double *ret, pcg64_t *rng64) {
-	fence();
+double
+pcg64_double53(pcg64_t *rng64) {
 	uint64_t u = pcg64_random_fast(rng64);
-	*ret = (double)(u >> 11) * 0x1.0p-53;
-	fence();
+	return ((double)(u >> 11) * 0x1.0p-53);
 }
 
 
@@ -139,6 +103,20 @@ pcg64_double53(double *ret, pcg64_t *rng64) {
 #else
 
 #include "nanotime.h"
+
+#ifdef __arm64__
+#include <arm_acle.h>
+#define fence() __isb(15)
+#endif
+
+#ifdef __amd64__
+#include <immintrin.h>
+#define fence() _mm_lfence()
+#endif
+
+#ifndef fence
+#define fence()
+#endif
 
 static double
 check(uint64_t count) {
@@ -160,11 +138,10 @@ static void time_baseline(void) {
 
 	uint64_t t0 = nanotime();
 
-	float sum = 0.0;
+	double sum = 0.0;
 	for(uint32_t u = 0; u < count; u++) {
-		float ret;
-		baseline(&ret, &u);
-		sum += ret;
+		fence();
+		sum += baseline(u);
 	}
 
 	uint64_t t1 = nanotime();
@@ -181,10 +158,8 @@ static void time_seq23(void) {
 
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
-		float ret;
-		uint32_t a =  u << (32 - shift);
-		float23(&ret, &a);
-		sum += ret;
+		fence();
+		sum += float23(u << (32 - shift));
 	}
 
 	uint64_t t1 = nanotime();
@@ -202,10 +177,8 @@ static void time_seq24(void) {
 
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
-		float ret;
-		uint32_t a =  u << (32 - shift);
-		float24(&ret, &a);
-		sum += ret;
+		fence();
+		sum += float24(u << (32 - shift));
 	}
 
 	uint64_t t1 = nanotime();
@@ -224,10 +197,8 @@ static void time_seq52(void) {
 
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
-		double ret;
-		uint64_t a =  u << (64 - shift);
-		double52(&ret, &a);
-		sum += ret;
+		fence();
+		sum += double52(u << (64 - shift));
 	}
 
 	uint64_t t1 = nanotime();
@@ -245,10 +216,8 @@ static void time_seq53(void) {
 
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
-		double ret;
-		uint64_t a =  u << (64 - shift);
-		double53(&ret, &a);
-		sum += ret;
+		fence();
+		sum += double53(u << (64 - shift));
 	}
 
 	uint64_t t1 = nanotime();
@@ -266,9 +235,8 @@ static void time_rand23(void) {
 
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
-		float ret;
-		pcg32_float23(&ret, rng32);
-		sum += ret;
+		fence();
+		sum += pcg32_float23(rng32);
 	}
 
 	uint64_t t1 = nanotime();
@@ -285,9 +253,8 @@ static void time_rand24(void) {
 
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
-		float ret;
-		pcg32_float24(&ret, rng32);
-		sum += ret;
+		fence();
+		sum += pcg32_float24(rng32);
 	}
 
 	uint64_t t1 = nanotime();
@@ -304,9 +271,8 @@ static void time_rand52(void) {
 
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
-		double ret;
-		pcg64_double52(&ret, rng64);
-		sum += ret;
+		fence();
+		sum += pcg64_double52(rng64);
 	}
 
 	uint64_t t1 = nanotime();
@@ -323,9 +289,8 @@ static void time_rand53(void) {
 
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
-		double ret;
-		pcg64_double53(&ret, rng64);
-		sum += ret;
+		fence();
+		sum += pcg64_double53(rng64);
 	}
 
 	uint64_t t1 = nanotime();
