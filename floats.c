@@ -41,7 +41,7 @@
 #define fence()
 #endif
 
-extern void baseline(double *ret, uint32_t *u);
+extern void baseline(float *ret, uint32_t *u);
 extern void float23(float *ret, uint32_t *u);
 extern void float24(float *ret, uint32_t *u);
 extern void double52(double *ret, uint64_t *u);
@@ -60,10 +60,9 @@ extern void pcg64_double53(double *ret, pcg64_t *rng64);
 	}){ ._v = (v) })._t)
 
 void
-baseline(double *ret, uint32_t *pu) {
+baseline(float *ret, uint32_t *pu) {
 	fence();
-	(void)pu;
-	*ret = 0.0;
+	*ret = bitcast(float, *pu);
 	fence();
 }
 
@@ -161,9 +160,9 @@ static void time_baseline(void) {
 
 	uint64_t t0 = nanotime();
 
-	double sum = 0.0;
+	float sum = 0.0;
 	for(uint32_t u = 0; u < count; u++) {
-		double ret;
+		float ret;
 		baseline(&ret, &u);
 		sum += ret;
 	}
