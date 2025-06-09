@@ -41,11 +41,11 @@
 #define fence()
 #endif
 
-extern void baseline(double *ret, uint32_t u);
-extern void float23(float *ret, uint32_t u);
-extern void float24(float *ret, uint32_t u);
-extern void double52(double *ret, uint64_t u);
-extern void double53(double *ret, uint64_t u);
+extern void baseline(double *ret, uint32_t *u);
+extern void float23(float *ret, uint32_t *u);
+extern void float24(float *ret, uint32_t *u);
+extern void double52(double *ret, uint64_t *u);
+extern void double53(double *ret, uint64_t *u);
 extern void pcg32_float23(float *ret, pcg32_t *rng32);
 extern void pcg32_float24(float *ret, pcg32_t *rng32);
 extern void pcg64_double52(double *ret, pcg64_t *rng64);
@@ -60,39 +60,43 @@ extern void pcg64_double53(double *ret, pcg64_t *rng64);
 	}){ ._v = (v) })._t)
 
 void
-baseline(double *ret, uint32_t u) {
+baseline(double *ret, uint32_t *pu) {
 	fence();
-	(void)u;
+	(void)pu;
 	*ret = 0.0;
 	fence();
 }
 
 void
-float23(float *ret, uint32_t u) {
+float23(float *ret, uint32_t *pu) {
 	fence();
+	uint32_t u = *pu;
 	u = ((uint32_t)(127) << 23) | (u >> 9);
         *ret = bitcast(float, u) - 1.0f;
 	fence();
 }
 
 void
-float24(float *ret, uint32_t u) {
+float24(float *ret, uint32_t *pu) {
 	fence();
+	uint32_t u = *pu;
 	*ret = (float)(u >> 8) * 0x1.0p-24f;
 	fence();
 }
 
 void
-double52(double *ret, uint64_t u) {
+double52(double *ret, uint64_t *pu) {
 	fence();
+	uint64_t u = *pu;
 	u = ((uint64_t)(1023) << 52) | (u >> 12);
         *ret = bitcast(double, u) - 1.0;
 	fence();
 }
 
 void
-double53(double *ret, uint64_t u) {
+double53(double *ret, uint64_t *pu) {
 	fence();
+	uint64_t u = *pu;
 	*ret = (double)(u >> 11) * 0x1.0p-53;
 	fence();
 }
@@ -160,7 +164,7 @@ static void time_baseline(void) {
 	double sum = 0.0;
 	for(uint32_t u = 0; u < count; u++) {
 		double ret;
-		baseline(&ret, u);
+		baseline(&ret, &u);
 		sum += ret;
 	}
 
@@ -179,7 +183,8 @@ static void time_seq23(void) {
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
 		float ret;
-		float23(&ret, u << (32 - shift));
+		uint32_t a =  u << (32 - shift);
+		float23(&ret, &a);
 		sum += ret;
 	}
 
@@ -199,7 +204,8 @@ static void time_seq24(void) {
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
 		float ret;
-		float24(&ret, u << (32 - shift));
+		uint32_t a =  u << (32 - shift);
+		float24(&ret, &a);
 		sum += ret;
 	}
 
@@ -220,7 +226,8 @@ static void time_seq52(void) {
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
 		double ret;
-		double52(&ret, u << (64 - shift));
+		uint64_t a =  u << (64 - shift);
+		double52(&ret, &a);
 		sum += ret;
 	}
 
@@ -240,7 +247,8 @@ static void time_seq53(void) {
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
 		double ret;
-		double53(&ret, u << (64 - shift));
+		uint64_t a =  u << (64 - shift);
+		double53(&ret, &a);
 		sum += ret;
 	}
 
