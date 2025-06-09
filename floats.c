@@ -37,7 +37,7 @@ extern float pcg32_float24(pcg32_t *rng32);
 extern double pcg64_double52(pcg64_t *rng64);
 extern double pcg64_double53(pcg64_t *rng64);
 
-#ifdef SEPARATE
+#ifdef CONVERSIONS
 
 #define bitcast(t,v) (((union {				\
 		static_assert(sizeof(t) == sizeof(v),	\

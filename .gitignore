@@ -7,5 +7,5 @@ bytes
 bytes-*
 bytes.h
 floats
+floats-*
 floats.o
-fcvt.o
