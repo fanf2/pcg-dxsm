@@ -27,83 +27,6 @@
 #include "pcg32.h"
 #include "pcg64.h"
 
-extern double baseline(uint32_t u);
-extern float float23(uint32_t u);
-extern float float24(uint32_t u);
-extern double double52(uint64_t u);
-extern double double53(uint64_t u);
-extern float pcg32_float23(pcg32_t *rng32);
-extern float pcg32_float24(pcg32_t *rng32);
-extern double pcg64_double52(pcg64_t *rng64);
-extern double pcg64_double53(pcg64_t *rng64);
-
-#ifdef CONVERSIONS
-
-#define bitcast(t,v) (((union {				\
-		static_assert(sizeof(t) == sizeof(v),	\
-			      "sizes must match");	\
-		__typeof__(v) _v; t _t;			\
-	}){ ._v = (v) })._t)
-
-double
-baseline(uint32_t u) {
-	return((void)(u), 0.0);
-}
-
-float
-float23(uint32_t u) {
-	u = ((uint32_t)(127) << 23) | (u >> 9);
-        return(bitcast(float, u) - 1.0f);
-}
-
-float
-float24(uint32_t u) {
-	return ((float)(u >> 8) * 0x1.0p-24f);
-}
-
-double
-double52(uint64_t u) {
-	u = ((uint64_t)(1023) << 52) | (u >> 12);
-        return(bitcast(double, u) - 1.0);
-}
-
-double
-double53(uint64_t u) {
-	return ((double)(u >> 11) * 0x1.0p-53);
-}
-
-float
-pcg32_float23(pcg32_t *rng32) {
-	uint32_t u = pcg32_random_fast(rng32);
-	u = ((uint32_t)(127) << 23) | (u >> 9);
-        return(bitcast(float, u) - 1.0f);
-}
-
-float
-pcg32_float24(pcg32_t *rng32) {
-	uint32_t u = pcg32_random_fast(rng32);
-	return ((float)(u >> 8) * 0x1.0p-24f);
-}
-
-double
-pcg64_double52(pcg64_t *rng64) {
-	uint64_t u = pcg64_random_fast(rng64);
-	u = ((uint64_t)(1023) << 52) | (u >> 12);
-        return(bitcast(double, u) - 1.0);
-}
-
-double
-pcg64_double53(pcg64_t *rng64) {
-	uint64_t u = pcg64_random_fast(rng64);
-	return ((double)(u >> 11) * 0x1.0p-53);
-}
-
-
-
-#else
-
-#include "nanotime.h"
-
 #ifdef __arm64__
 #include <arm_acle.h>
 #define fence() __isb(15)
@@ -117,6 +40,102 @@ pcg64_double53(pcg64_t *rng64) {
 #ifndef fence
 #define fence()
 #endif
+
+extern void baseline(double *ret, uint32_t u);
+extern void float23(float *ret, uint32_t u);
+extern void float24(float *ret, uint32_t u);
+extern void double52(double *ret, uint64_t u);
+extern void double53(double *ret, uint64_t u);
+extern void pcg32_float23(float *ret, pcg32_t *rng32);
+extern void pcg32_float24(float *ret, pcg32_t *rng32);
+extern void pcg64_double52(double *ret, pcg64_t *rng64);
+extern void pcg64_double53(double *ret, pcg64_t *rng64);
+
+#ifdef CONVERSIONS
+
+#define bitcast(t,v) (((union {				\
+		static_assert(sizeof(t) == sizeof(v),	\
+			      "sizes must match");	\
+		__typeof__(v) _v; t _t;			\
+	}){ ._v = (v) })._t)
+
+void
+baseline(double *ret, uint32_t u) {
+	fence();
+	(void)u;
+	*ret = 0.0;
+	fence();
+}
+
+void
+float23(float *ret, uint32_t u) {
+	fence();
+	u = ((uint32_t)(127) << 23) | (u >> 9);
+        *ret = bitcast(float, u) - 1.0f;
+	fence();
+}
+
+void
+float24(float *ret, uint32_t u) {
+	fence();
+	*ret = (float)(u >> 8) * 0x1.0p-24f;
+	fence();
+}
+
+void
+double52(double *ret, uint64_t u) {
+	fence();
+	u = ((uint64_t)(1023) << 52) | (u >> 12);
+        *ret = bitcast(double, u) - 1.0;
+	fence();
+}
+
+void
+double53(double *ret, uint64_t u) {
+	fence();
+	*ret = (double)(u >> 11) * 0x1.0p-53;
+	fence();
+}
+
+void
+pcg32_float23(float *ret, pcg32_t *rng32) {
+	fence();
+	uint32_t u = pcg32_random_fast(rng32);
+	u = ((uint32_t)(127) << 23) | (u >> 9);
+        *ret = bitcast(float, u) - 1.0f;
+	fence();
+}
+
+void
+pcg32_float24(float *ret, pcg32_t *rng32) {
+	fence();
+	uint32_t u = pcg32_random_fast(rng32);
+	*ret = (float)(u >> 8) * 0x1.0p-24f;
+	fence();
+}
+
+void
+pcg64_double52(double *ret, pcg64_t *rng64) {
+	fence();
+	uint64_t u = pcg64_random_fast(rng64);
+	u = ((uint64_t)(1023) << 52) | (u >> 12);
+        *ret = bitcast(double, u) - 1.0;
+	fence();
+}
+
+void
+pcg64_double53(double *ret, pcg64_t *rng64) {
+	fence();
+	uint64_t u = pcg64_random_fast(rng64);
+	*ret = (double)(u >> 11) * 0x1.0p-53;
+	fence();
+}
+
+
+
+#else
+
+#include "nanotime.h"
 
 static double
 check(uint64_t count) {
@@ -140,8 +159,9 @@ static void time_baseline(void) {
 
 	double sum = 0.0;
 	for(uint32_t u = 0; u < count; u++) {
-		fence();
-		sum += baseline(u);
+		double ret;
+		baseline(&ret, u);
+		sum += ret;
 	}
 
 	uint64_t t1 = nanotime();
@@ -158,8 +178,9 @@ static void time_seq23(void) {
 
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
-		fence();
-		sum += float23(u << (32 - shift));
+		float ret;
+		float23(&ret, u << (32 - shift));
+		sum += ret;
 	}
 
 	uint64_t t1 = nanotime();
@@ -177,8 +198,9 @@ static void time_seq24(void) {
 
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
-		fence();
-		sum += float24(u << (32 - shift));
+		float ret;
+		float24(&ret, u << (32 - shift));
+		sum += ret;
 	}
 
 	uint64_t t1 = nanotime();
@@ -197,8 +219,9 @@ static void time_seq52(void) {
 
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
-		fence();
-		sum += double52(u << (64 - shift));
+		double ret;
+		double52(&ret, u << (64 - shift));
+		sum += ret;
 	}
 
 	uint64_t t1 = nanotime();
@@ -216,8 +239,9 @@ static void time_seq53(void) {
 
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
-		fence();
-		sum += double53(u << (64 - shift));
+		double ret;
+		double53(&ret, u << (64 - shift));
+		sum += ret;
 	}
 
 	uint64_t t1 = nanotime();
@@ -235,8 +259,9 @@ static void time_rand23(void) {
 
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
-		fence();
-		sum += pcg32_float23(rng32);
+		float ret;
+		pcg32_float23(&ret, rng32);
+		sum += ret;
 	}
 
 	uint64_t t1 = nanotime();
@@ -253,8 +278,9 @@ static void time_rand24(void) {
 
 	float sum = 0.0f;
 	for(uint32_t u = 0; u < count; u++) {
-		fence();
-		sum += pcg32_float24(rng32);
+		float ret;
+		pcg32_float24(&ret, rng32);
+		sum += ret;
 	}
 
 	uint64_t t1 = nanotime();
@@ -271,8 +297,9 @@ static void time_rand52(void) {
 
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
-		fence();
-		sum += pcg64_double52(rng64);
+		double ret;
+		pcg64_double52(&ret, rng64);
+		sum += ret;
 	}
 
 	uint64_t t1 = nanotime();
@@ -289,8 +316,9 @@ static void time_rand53(void) {
 
 	double sum = 0.0;
 	for(uint64_t u = 0; u < count; u++) {
-		fence();
-		sum += pcg64_double53(rng64);
+		double ret;
+		pcg64_double53(&ret, rng64);
+		sum += ret;
 	}
 
 	uint64_t t1 = nanotime();
