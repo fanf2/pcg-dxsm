@@ -47,7 +47,7 @@ extern double pcg64_double53(pcg64_t *rng64);
 
 double
 baseline(uint32_t u) {
-	return((void)(u), 1.0);
+	return((void)(u), 0.0);
 }
 
 float
@@ -134,7 +134,7 @@ speed(uint64_t count, uint64_t t0, uint64_t t1) {
 }
 
 static void time_baseline(void) {
-	uint32_t count = 1 << 26;
+	uint32_t count = 1 << 24;
 
 	uint64_t t0 = nanotime();
 
