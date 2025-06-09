@@ -27,6 +27,7 @@
 #include "pcg32.h"
 #include "pcg64.h"
 
+extern double baseline(uint32_t u);
 extern float float23(uint32_t u);
 extern float float24(uint32_t u);
 extern double double52(uint64_t u);
@@ -43,6 +44,11 @@ extern double pcg64_double53(pcg64_t *rng64);
 			      "sizes must match");	\
 		__typeof__(v) _v; t _t;			\
 	}){ ._v = (v) })._t)
+
+double
+baseline(uint32_t u) {
+	return((void)(u), 1.0);
+}
 
 float
 float23(uint32_t u) {
@@ -125,6 +131,23 @@ static double
 speed(uint64_t count, uint64_t t0, uint64_t t1) {
 	uint64_t ns = t1 - t0;
 	return((double)(ns) / (double)(count));
+}
+
+static void time_baseline(void) {
+	uint32_t count = 1 << 26;
+
+	uint64_t t0 = nanotime();
+
+	double sum = 0.0;
+	for(uint32_t u = 0; u < count; u++) {
+		fence();
+		sum += baseline(u);
+	}
+
+	uint64_t t1 = nanotime();
+
+	printf("00 total %f\n", (double)(sum));
+	printf("00 speed %f\n", speed(count, t0, t1));
 }
 
 static void time_seq23(void) {
@@ -283,6 +306,8 @@ int main(void) {
 		rand ^= pcg32_random(rng32);
 	}
 	printf("warmup %x\n", rand);
+
+	time_baseline();
 
 	time_seq23();
 	time_seq24();
