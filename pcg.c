@@ -126,6 +126,6 @@ pcg_rand_slow(pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample) {
 	 */
 	pcg_uint_t reject = -limit % limit;
 	while ((pcg_uint_t)(sample) < reject)
-		sample = pcg_ulong_biased(rng, limit);
+		sample = (pcg_ulong_t) pcg_random_fast(rng) * limit;
 	return ((pcg_uint_t)(sample >> PCG_UINT_BITS));
 }
