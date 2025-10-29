@@ -15,11 +15,10 @@ test_shuffle64(pcg64_t *rng) {
 	size_t suits = 4;
 	size_t ranks = 13;
 	size_t count = suits * ranks;
-	char deck[] =
-		" A♣︎ 2♣︎ 3♣︎ 4♣︎ 5♣︎ 6♣︎ 7♣︎ 8♣︎ 9♣︎ 0♣︎ J♣︎ Q♣︎ K♣︎"
-		" A♦︎ 2♦︎ 3♦︎ 4♦︎ 5♦︎ 6♦︎ 7♦︎ 8♦︎ 9♦︎ 0♦︎ J♦︎ Q♦︎ K♦︎"
-		" A♥︎ 2♥︎ 3♥︎ 4♥︎ 5♥︎ 6♥︎ 7♥︎ 8♥︎ 9♥︎ 0♥︎ J♥︎ Q♥︎ K♥︎"
-		" A♠︎ 2♠︎ 3♠︎ 4♠︎ 5♠︎ 6♠︎ 7♠︎ 8♠︎ 9♠︎ 0♠︎ J♠︎ Q♠︎ K♠︎";
+	char deck[] = " A♣︎ 2♣︎ 3♣︎ 4♣︎ 5♣︎ 6♣︎ 7♣︎ 8♣︎ 9♣︎ 0♣︎ J♣︎ Q♣︎ K♣︎"
+		      " A♦︎ 2♦︎ 3♦︎ 4♦︎ 5♦︎ 6♦︎ 7♦︎ 8♦︎ 9♦︎ 0♦︎ J♦︎ Q♦︎ K♦︎"
+		      " A♥︎ 2♥︎ 3♥︎ 4♥︎ 5♥︎ 6♥︎ 7♥︎ 8♥︎ 9♥︎ 0♥︎ J♥︎ Q♥︎ K♥︎"
+		      " A♠︎ 2♠︎ 3♠︎ 4♠︎ 5♠︎ 6♠︎ 7♠︎ 8♠︎ 9♠︎ 0♠︎ J♠︎ Q♠︎ K♠︎";
 	size_t len = sizeof(deck) - 1;
 	size_t size = len / count;
 	pcg64_shuffle(rng, deck, count, size);

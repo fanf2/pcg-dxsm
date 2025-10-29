@@ -23,14 +23,14 @@ nanotime(void) {
 
 #include <time.h>
 
-#define NS_PER_S (1000*1000*1000)
+#define NS_PER_S (1000 * 1000 * 1000)
 
 static uint64_t
 nanotime(void) {
 	struct timespec tv;
 	assert(clock_gettime(CLOCK_MONOTONIC, &tv) == 0);
 	__sync_synchronize();
-	return((uint64_t)tv.tv_sec * NS_PER_S + (uint64_t)tv.tv_nsec);
+	return ((uint64_t)tv.tv_sec * NS_PER_S + (uint64_t)tv.tv_nsec);
 }
 
 #endif

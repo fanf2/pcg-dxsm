@@ -71,7 +71,7 @@ float23(float *ret, uint32_t *pu) {
 	fence();
 	uint32_t u = *pu;
 	u = ((uint32_t)(127) << 23) | (u >> 9);
-        *ret = bitcast(float, u) - 1.0f;
+	*ret = bitcast(float, u) - 1.0f;
 	fence();
 }
 
@@ -88,7 +88,7 @@ double52(double *ret, uint64_t *pu) {
 	fence();
 	uint64_t u = *pu;
 	u = ((uint64_t)(1023) << 52) | (u >> 12);
-        *ret = bitcast(double, u) - 1.0;
+	*ret = bitcast(double, u) - 1.0;
 	fence();
 }
 
@@ -105,7 +105,7 @@ pcg32_float23(float *ret, pcg32_t *rng32) {
 	fence();
 	uint32_t u = pcg32_random_fast(rng32);
 	u = ((uint32_t)(127) << 23) | (u >> 9);
-        *ret = bitcast(float, u) - 1.0f;
+	*ret = bitcast(float, u) - 1.0f;
 	fence();
 }
 
@@ -122,7 +122,7 @@ pcg64_double52(double *ret, pcg64_t *rng64) {
 	fence();
 	uint64_t u = pcg64_random_fast(rng64);
 	u = ((uint64_t)(1023) << 52) | (u >> 12);
-        *ret = bitcast(double, u) - 1.0;
+	*ret = bitcast(double, u) - 1.0;
 	fence();
 }
 
@@ -143,25 +143,26 @@ pcg64_double53(double *ret, pcg64_t *rng64) {
 static double
 check(uint64_t count) {
 	uint64_t sum = 0;
-	for(uint64_t u = 0; u < count; u++) {
+	for (uint64_t u = 0; u < count; u++) {
 		sum += u;
 	}
-	return((double)(sum) / (double)(count));
+	return ((double)(sum) / (double)(count));
 }
 
 static double
 speed(uint64_t count, uint64_t t0, uint64_t t1) {
 	uint64_t ns = t1 - t0;
-	return((double)(ns) / (double)(count));
+	return ((double)(ns) / (double)(count));
 }
 
-static void time_baseline(void) {
+static void
+time_baseline(void) {
 	uint32_t count = 1 << 24;
 
 	uint64_t t0 = nanotime();
 
 	float sum = 0.0;
-	for(uint32_t u = 0; u < count; u++) {
+	for (uint32_t u = 0; u < count; u++) {
 		float ret;
 		baseline(&ret, &u);
 		sum += ret;
@@ -173,16 +174,17 @@ static void time_baseline(void) {
 	printf("00 speed %f\n", speed(count, t0, t1));
 }
 
-static void time_seq23(void) {
+static void
+time_seq23(void) {
 	uint32_t shift = 23;
 	uint32_t count = 1 << shift;
 
 	uint64_t t0 = nanotime();
 
 	float sum = 0.0f;
-	for(uint32_t u = 0; u < count; u++) {
+	for (uint32_t u = 0; u < count; u++) {
 		float ret;
-		uint32_t a =  u << (32 - shift);
+		uint32_t a = u << (32 - shift);
 		float23(&ret, &a);
 		sum += ret;
 	}
@@ -194,16 +196,17 @@ static void time_seq23(void) {
 	printf("23 speed %f\n", speed(count, t0, t1));
 }
 
-static void time_seq24(void) {
+static void
+time_seq24(void) {
 	uint32_t shift = 24;
 	uint32_t count = 1 << shift;
 
 	uint64_t t0 = nanotime();
 
 	float sum = 0.0f;
-	for(uint32_t u = 0; u < count; u++) {
+	for (uint32_t u = 0; u < count; u++) {
 		float ret;
-		uint32_t a =  u << (32 - shift);
+		uint32_t a = u << (32 - shift);
 		float24(&ret, &a);
 		sum += ret;
 	}
@@ -215,7 +218,8 @@ static void time_seq24(void) {
 	printf("24 speed %f\n", speed(count, t0, t1));
 }
 
-static void time_seq52(void) {
+static void
+time_seq52(void) {
 	// somewhere around a second of run time
 	uint64_t shift = 26;
 	uint64_t count = 1 << shift;
@@ -223,9 +227,9 @@ static void time_seq52(void) {
 	uint64_t t0 = nanotime();
 
 	double sum = 0.0;
-	for(uint64_t u = 0; u < count; u++) {
+	for (uint64_t u = 0; u < count; u++) {
 		double ret;
-		uint64_t a =  u << (64 - shift);
+		uint64_t a = u << (64 - shift);
 		double52(&ret, &a);
 		sum += ret;
 	}
@@ -237,16 +241,17 @@ static void time_seq52(void) {
 	printf("52 speed %f\n", speed(count, t0, t1));
 }
 
-static void time_seq53(void) {
+static void
+time_seq53(void) {
 	uint64_t shift = 26;
 	uint64_t count = 1 << shift;
 
 	uint64_t t0 = nanotime();
 
 	double sum = 0.0;
-	for(uint64_t u = 0; u < count; u++) {
+	for (uint64_t u = 0; u < count; u++) {
 		double ret;
-		uint64_t a =  u << (64 - shift);
+		uint64_t a = u << (64 - shift);
 		double53(&ret, &a);
 		sum += ret;
 	}
@@ -258,14 +263,15 @@ static void time_seq53(void) {
 	printf("53 speed %f\n", speed(count, t0, t1));
 }
 
-static void time_rand23(void) {
-	pcg32_t rng32[] = { pcg32_getentropy() };
+static void
+time_rand23(void) {
+	pcg32_t rng32[] = {pcg32_getentropy()};
 	uint32_t count = 1 << 24;
 
 	uint64_t t0 = nanotime();
 
 	float sum = 0.0f;
-	for(uint32_t u = 0; u < count; u++) {
+	for (uint32_t u = 0; u < count; u++) {
 		float ret;
 		pcg32_float23(&ret, rng32);
 		sum += ret;
@@ -277,14 +283,15 @@ static void time_rand23(void) {
 	printf("23 speed %f\n", speed(count, t0, t1));
 }
 
-static void time_rand24(void) {
-	pcg32_t rng32[] = { pcg32_getentropy() };
+static void
+time_rand24(void) {
+	pcg32_t rng32[] = {pcg32_getentropy()};
 	uint32_t count = 1 << 24;
 
 	uint64_t t0 = nanotime();
 
 	float sum = 0.0f;
-	for(uint32_t u = 0; u < count; u++) {
+	for (uint32_t u = 0; u < count; u++) {
 		float ret;
 		pcg32_float24(&ret, rng32);
 		sum += ret;
@@ -296,14 +303,15 @@ static void time_rand24(void) {
 	printf("24 speed %f\n", speed(count, t0, t1));
 }
 
-static void time_rand52(void) {
-	pcg64_t rng64[] = { pcg64_getentropy() };
+static void
+time_rand52(void) {
+	pcg64_t rng64[] = {pcg64_getentropy()};
 	uint32_t count = 1 << 24;
 
 	uint64_t t0 = nanotime();
 
 	double sum = 0.0;
-	for(uint64_t u = 0; u < count; u++) {
+	for (uint64_t u = 0; u < count; u++) {
 		double ret;
 		pcg64_double52(&ret, rng64);
 		sum += ret;
@@ -315,14 +323,15 @@ static void time_rand52(void) {
 	printf("52 speed %f\n", speed(count, t0, t1));
 }
 
-static void time_rand53(void) {
-	pcg64_t rng64[] = { pcg64_getentropy() };
+static void
+time_rand53(void) {
+	pcg64_t rng64[] = {pcg64_getentropy()};
 	uint32_t count = 1 << 24;
 
 	uint64_t t0 = nanotime();
 
 	double sum = 0.0;
-	for(uint64_t u = 0; u < count; u++) {
+	for (uint64_t u = 0; u < count; u++) {
 		double ret;
 		pcg64_double53(&ret, rng64);
 		sum += ret;
@@ -334,10 +343,11 @@ static void time_rand53(void) {
 	printf("53 speed %f\n", speed(count, t0, t1));
 }
 
-int main(void) {
-	pcg32_t rng32[] = { pcg32_getentropy() };
+int
+main(void) {
+	pcg32_t rng32[] = {pcg32_getentropy()};
 	uint32_t rand = 0;
-	for(uint32_t i = 0; i < 0x10000000; i++) {
+	for (uint32_t i = 0; i < 0x10000000; i++) {
 		rand ^= pcg32_random(rng32);
 	}
 	printf("warmup %x\n", rand);
