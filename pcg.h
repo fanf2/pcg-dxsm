@@ -107,8 +107,8 @@ pcg_rand_const(pcg_t *rng, pcg_uint_t limit) {
 	 *	L = a + b * limit
 	 *
 	 * Lower-half values are spaced `limit` apart by the multiplication.
-	 * Depending on U, `b` (and therefore L) has `quota` or `quota + 1`
-	 * possible values, and the alignment varies, `0 <= a < limit`.
+	 * Depending on U, their alignment varies, `0 <= a < limit`, leaving
+	 * `quota` or `quota + 1` possible values for `b`, and therefore L.
 	 *
 	 * We split the `range` covering L into two spans of size `yield`
 	 * and `reject`. The `yield` span is a multiple of `limit` so it
