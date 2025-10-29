@@ -57,8 +57,18 @@ test_shuffle32(pcg32_t *rng) {
 
 int
 main(void) {
-	pcg32_t rng32[] = { pcg32_getentropy() };
+	char buf[260];
+
+	pcg32_t rng32[] = {pcg32_getentropy()};
+	size_t len32 = pcg32_totext(buf, sizeof(buf), rng32);
+	assert(0 < len32 && len32 < sizeof(buf));
+	assert(buf[len32 - 1] != '\0' && buf[len32] == '\0');
+	buf[len32 + 0] = '\n';
+	buf[len32 + 1] = '\0';
+	printf("hex   %s", buf);
 	uint32_t var32 = pcg32_random(rng32);
+	assert(pcg32_fromtext(buf, rng32) == len32);
+	assert(var32 == pcg32_random(rng32));
 	printf("zero  %" PRIX32 "\n", pcg32_rand(rng32, 0));
 	printf("mask  %" PRIX32 "\n", pcg32_rand(rng32, 1UL << 20));
 	printf("prime %" PRIX32 "\n", pcg32_rand(rng32, (1UL << 19) - 1));
@@ -67,8 +77,16 @@ main(void) {
 	printf("small %" PRIX32 "\n", pcg32_rand_small(rng32, INT32_MAX));
 	printf("fp %.8f\n", (double)pcg32_float(rng32));
 
-	pcg64_t rng64[] = { pcg64_getentropy() };
+	pcg64_t rng64[] = {pcg64_getentropy()};
+	size_t len64 = pcg64_totext(buf, sizeof(buf), rng64);
+	assert(0 < len64 && len64 < sizeof(buf));
+	assert(buf[len64 - 1] != '\0' && buf[len64] == '\0');
+	buf[len64 + 0] = '\n';
+	buf[len64 + 1] = '\0';
+	printf("hex   %s", buf);
 	uint64_t var64 = pcg64_random(rng64);
+	assert(pcg64_fromtext(buf, rng64) == len64);
+	assert(var64 == pcg64_random(rng64));
 	printf("zero  %" PRIX64 "\n", pcg64_rand(rng64, 0));
 	printf("mask  %" PRIX64 "\n", pcg64_rand(rng64, 1ULL << 40));
 	printf("prime %" PRIX64 "\n", pcg64_rand(rng64, (1ULL << 31) - 1));

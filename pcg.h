@@ -18,6 +18,25 @@ extern pcg_t pcg_getentropy(void);
 extern pcg_t pcg_seed(pcg_t seed);
 
 /*
+ * Serialize the random number generator as a printable string so that
+ * the seed can be recorded and the results can be reproduced later.
+ *
+ * The return value is always the length of the output string excluding the
+ * terminating '\0'. If size is too small then nothing is written to buf.
+ */
+extern size_t pcg_totext(
+	char *restrict buf, size_t size, const pcg_t *restrict rng);
+
+/*
+ * Deserialize the random number generator from a string, which can be
+ * terminated by `\0' or space or any of "\t\n\v\f\r".
+ *
+ * The return value is zero if there is a syntax error,
+ * or the length of the string excluding the terminator.
+ */
+extern size_t pcg_fromtext(const char *restrict buf, pcg_t *restrict rng);
+
+/*
  * Get a word full of random bits
  *
  * The pcg_random() macro automatically selects a suitable alternative

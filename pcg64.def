@@ -22,3 +22,5 @@
 #define pcg_shuffle      pcg64_shuffle
 #define pcg_seed         pcg64_seed
 #define pcg_getentropy   pcg64_getentropy
+#define pcg_totext       pcg64_totext
+#define pcg_fromtext     pcg64_fromtext
