@@ -121,8 +121,8 @@ pcg_rand_small(pcg_t *rng, pcg_uint_t limit) {
 pcg_uint_t
 pcg_rand_slow(pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample) {
 	/*
-	 * This % is safe: we know that `limit` is strictly greater than
-	 * zero because of the slow-path guard in pcg_rand_fast().
+	 * The % is explained in pcg_rand_const(). The slow-path
+	 * guard in pcg_rand_fast() ensures `limit` is nonzero.
 	 */
 	pcg_uint_t reject = -limit % limit;
 	while ((pcg_uint_t)(sample) < reject)
