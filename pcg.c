@@ -42,8 +42,8 @@ pcg_totext(char *restrict buf, size_t size, const pcg_t *restrict rng) {
 
 size_t
 pcg_fromtext(const char *restrict cbuf, pcg_t *restrict rng) {
-	const unsigned char *ubuf = (const unsigned char *)(cbuf);
-	static const signed char unhex[] = {
+	const uint8_t *ubuf = (const uint8_t *)(cbuf);
+	static const int8_t unhex[] = {
 /*       0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f */
 /* 0 */ -1, -2, -2, -2, -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -2, -2,
 /* 1 */ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
@@ -66,7 +66,7 @@ pcg_fromtext(const char *restrict cbuf, pcg_t *restrict rng) {
 	for (size_t i = 0; i < 2; i++) {
 		for (size_t j = 0; j < 2; j++) {
 			for (size_t k = 0; k < sizeof(pcg_ulong_t); k++) {
-				signed char h = unhex[*ubuf++];
+				int8_t h = unhex[*ubuf++];
 				if (h < 0) return (0);
 				v[i] = (v[i] << 4) | (pcg_ulong_t)(h);
 			}
