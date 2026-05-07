@@ -52,7 +52,7 @@ extern pcg_uint_t pcg_random_small(pcg_t *rng);
 static inline pcg_uint_t pcg_rand_fast(pcg_t *rng, pcg_uint_t limit);
 extern pcg_uint_t pcg_rand_small(pcg_t *rng, pcg_uint_t limit);
 /*
- * Internal helper out-of-line slow path for pcg_rand_fast()
+ * Private helper out-of-line slow path for pcg_rand_fast()
  */
 extern pcg_uint_t pcg_rand_slow(
 	pcg_t *rng, pcg_uint_t limit, pcg_ulong_t sample);
@@ -116,8 +116,8 @@ extern void pcg_shuffle(
  *
  * To avoid the division needed to calculate `reject`, we use `limit`
  * as a safe over-estimate (`limit > range % limit`). The slow path
- * will calculate the exact threshold, re-check and return this sample
- * if it passes, or re-try with another sample.
+ * will calculate the exact reject threshold, re-check and return this
+ * sample if it passes, or re-try with another sample.
  */
 static inline pcg_uint_t
 pcg_rand_fast(pcg_t *rng, pcg_uint_t limit) {
@@ -140,8 +140,6 @@ pcg_rand_const(pcg_t *rng, pcg_uint_t limit) {
 	 * reject =                range % limit
 	 *       ==      (range - limit) % limit // equiv modulo limit
 	 *       == (pcg_uint_t)(-limit) % limit // equiv modulo range
-	 *
-	 * This % is safe because of the guard in the pcg_rand() macro.
 	 */
 	pcg_uint_t reject = -limit % limit;
 	pcg_ulong_t sample;
