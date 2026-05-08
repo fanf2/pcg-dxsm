@@ -1,11 +1,12 @@
-Random numbers with PCG
-=======================
+Random numbers with PCG-32 and PCG-64
+=====================================
 
 This repository contains implementations in C of the preferred 32-bit
 and 64-bit variants of [Melissa O'Neill's PCG family of random number
 algorithms][pcg], with Daniel Lemire's nearly-divisionless algorithm
-for unbiased bounded random numbers, and functions for random byte
-strings, random floating point numbers, and random shuffles.
+for unbiased bounded random numbers; functions for generating random
+byte strings, random floating point numbers, and random shuffles; and
+for serializing and deserializing the RNG state,
 
 [pcg]: https://www.pcg-random.org/
 
@@ -29,6 +30,7 @@ The files `pcg.[ch]` contain code that is generic over the bit size:
   * seeding the RNG
   * Lemire's algorithm
   * random bytes and shuffles
+  * serializing and deserializing
 
 The files `pcg{32,64}.def` contain macros to configure the generic
 code for 32 bits and 64 bits, respectively. The files `pcg_blurb.[ch]`
@@ -139,9 +141,10 @@ automatically select inline or extern variants according to the
 compiler flags. You can call `_fast()` or `_small()` variants to
 override this choice.
 
-The `pcg_rand()` function is specialized for constant limit arguments
-so that the rejection loop is truly divisionless, and even omitted
-completely when the limit is a constant power of two.
+The `pcg_rand()` function is specialized so that when the limit
+argument is a compile time constant, the rejection loop is truly
+divisionless, and even omitted completely when the limit is a constant
+power of two.
 
 
 vectorized pcg32
@@ -152,6 +155,16 @@ unrolled and vectorized pcg32. This demonstrates SIMD optimization of
 a single instance of pcg32. Vectorized pcg32 produces the same
 sequence of random numbers generated in the same order as normal
 scalar pcg32, but much faster.
+
+
+floating point benchmark
+------------------------
+
+Run `make floats` to build a benchmark that tests different techniques
+for converting random integers to random floats. This demonstrates
+that the shift-and-multiply 24-bit and 53-bit conversions used by this
+PCG implementation are as fast as the bitcast-and-subtract 23-bit and
+52-bit conversions.
 
 
 license
