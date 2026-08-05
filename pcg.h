@@ -5,17 +5,26 @@ typedef struct pcg {
 } pcg_t;
 
 /*
+ * Initialize a random number generator to a predetermined sequence based on
+ * the given state and (optional) inc values. The state determines the
+ * initial position on a sequence of random outputs; the inc value selects
+ * different sequences of outputs. A default sequence is used when inc is 0.
+ * You should always call pcg_seed() after manipulating the RNG state.
+ *
+ * For example, if you need distinct per-subsystem RNGs, you might generate a
+ * global seed then initialize each RNG like,
+ *
+ *	pcg_t rng = pcg_seed((pcg_t){
+ *		.state = global_seed,
+ *		.inc = hash("subsystem name"),
+ *	});
+ */
+extern pcg_t pcg_seed(pcg_t seed);
+
+/*
  * Initialize a random number generator from the kernel's entropy pool
  */
 extern pcg_t pcg_getentropy(void);
-
-/*
- * Initialize a random number generator to a fixed sequence
- * based on the given state and (optional) inc values, e.g.
- *
- *	pcg_t rng = pcg_seed((pcg_t){ .state = 3141592654 });
- */
-extern pcg_t pcg_seed(pcg_t seed);
 
 /*
  * Initialize a new random number generator using output from an existing one.
