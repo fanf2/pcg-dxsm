@@ -74,7 +74,7 @@ main(void) {
 	printf("var   %" PRIX32 "\n", pcg32_rand(rng32, var32));
 	printf("fast  %" PRIX32 "\n", pcg32_rand_fast(rng32, INT32_MAX));
 	printf("small %" PRIX32 "\n", pcg32_rand_small(rng32, INT32_MAX));
-	printf("fp %.8f\n", (double)pcg32_float(rng32));
+	printf("fp    %.8f\n", (double)pcg32_float(rng32));
 
 	pcg64_t rng64[] = {pcg64_getentropy()};
 	size_t len64 = pcg64_totext(buf, sizeof(buf), rng64);
@@ -92,7 +92,7 @@ main(void) {
 	printf("var   %" PRIX64 "\n", pcg64_rand(rng64, var64));
 	printf("fast  %" PRIX64 "\n", pcg64_rand_fast(rng64, INT64_MAX));
 	printf("small %" PRIX64 "\n", pcg64_rand_small(rng64, INT64_MAX));
-	printf("fp %.16f\n", pcg64_double(rng64));
+	printf("fp    %.16f\n", pcg64_double(rng64));
 
 	test_shuffle32(rng32);
 	test_shuffle64(rng64);
