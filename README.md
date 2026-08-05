@@ -6,7 +6,7 @@ and 64-bit variants of [Melissa O'Neill's PCG family of random number
 algorithms][pcg], with Daniel Lemire's nearly-divisionless algorithm
 for unbiased bounded random numbers; functions for generating random
 byte strings, random floating point numbers, and random shuffles; and
-for serializing and deserializing the RNG state,
+for splitting, serializing and deserializing the RNG state,
 
 [pcg]: https://www.pcg-random.org/
 
@@ -131,6 +131,19 @@ functions that generate random numbers in 0.0 <= ... < 1.0 using
 [divisionless]: https://dotat.at/@/2020-10-29-nearly-divisionless-random-numbers.html
 [split]: https://dotat.at/@/2024-06-25-lemire-inline.html
 [rand-float]: https://dotat.at/@/2023-06-23-random-double.html
+
+
+seeding an RNG
+--------------
+
+The usual way to create an unpredictable RNG is with `pcg_getentropy()`.
+You can deterministically split an RNG into two independent RNGs with
+`pcg_split()`.
+
+For reproducibility, you can used `pcg_totext()` and `pcg_fromtext()`
+to save and restore the RNG state.
+
+Use `pcg_seed()` if you need to control the sequence some other way.
 
 
 speed vs size
