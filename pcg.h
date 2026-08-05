@@ -18,6 +18,11 @@ extern pcg_t pcg_getentropy(void);
 extern pcg_t pcg_seed(pcg_t seed);
 
 /*
+ * Initialize a new random number generator using output from an existing one.
+ */
+extern pcg_t pcg_split(pcg_t *rng);
+
+/*
  * Serialize the random number generator as a printable string so that
  * the seed can be recorded and the results can be reproduced later.
  *

@@ -19,6 +19,14 @@ pcg_getentropy(void) {
 	return (pcg_seed(rng));
 }
 
+pcg_t
+pcg_split(pcg_t *source) {
+	pcg_t rng;
+	pcg_bytes(source, &rng, sizeof(rng));
+	/* slightly more work than necessary */
+	return (pcg_seed(rng));
+}
+
 size_t
 pcg_totext(char *restrict buf, size_t size, const pcg_t *restrict rng) {
 	static const char hex[] = "0123456789abcdef";

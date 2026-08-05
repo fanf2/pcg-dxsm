@@ -59,6 +59,8 @@ main(void) {
 	char buf[260];
 
 	pcg32_t rng32[] = {pcg32_getentropy()};
+	pcg32_t rng32b[] = {pcg32_split(rng32)};
+	assert(pcg32_random(rng32) != pcg32_random(rng32b));
 	size_t len32 = pcg32_totext(buf, sizeof(buf), rng32);
 	assert(0 < len32 && len32 < sizeof(buf));
 	assert(buf[len32 - 1] != '\0' && buf[len32] == '\0');
@@ -77,6 +79,8 @@ main(void) {
 	printf("fp    %.8f\n", (double)pcg32_float(rng32));
 
 	pcg64_t rng64[] = {pcg64_getentropy()};
+	pcg64_t rng64b[] = {pcg64_split(rng64)};
+	assert(pcg64_random(rng64) != pcg64_random(rng64b));
 	size_t len64 = pcg64_totext(buf, sizeof(buf), rng64);
 	assert(0 < len64 && len64 < sizeof(buf));
 	assert(buf[len64 - 1] != '\0' && buf[len64] == '\0');
